@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <Target Name="CreateCalli" BeforeTargets="BeforeBuild">
+    <Exec Command="dotnet run --project ..\CalliBuilder\CalliBuilder.csproj ClrDebug &quot;..\..\lib\ClrDebug.Calli.dll&quot;" />
+  </Target>
+
+  <ItemGroup>
+    <!-- <SharpGenMapping Include="Mapping.xml" /> -->
+    <!-- <PackageReference Include="Fody" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference> -->
+    <!-- <PackageReference Include="InlineIL.Fody" Version="1.3.1" PrivateAssets="all" /> -->
+    <Reference Include="..\..\lib\ClrDebug.Calli.dll" />
+    <PackageReference Include="System.Memory" Version="4.5.2" />
+    <!-- <PackageReference Include="SharpGen.Runtime" Version="1.2.0" /> -->
+    <!-- <PackageReference Include="SharpGenTools.Sdk" Version="1.2.0"> -->
+      <!-- <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets> -->
+      <!-- <PrivateAssets>all</PrivateAssets> -->
+    <!-- </PackageReference> -->
+  </ItemGroup>
+
+</Project>
