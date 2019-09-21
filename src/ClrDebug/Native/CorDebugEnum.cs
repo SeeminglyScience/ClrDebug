@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Runtime.InteropServices;
 
 using static ClrDebug.UnsafeOps;
 using static ClrDebug.CalliInstructions;
@@ -7,31 +10,30 @@ namespace ClrDebug.Native
 {
     public unsafe class CorDebugEnum : Unknown
     {
-        private ICorDebugEnumVtable** This => (ICorDebugEnumVtable**)DangerousGetPointer();
+        private protected ICorDebugEnumVtable** This => (ICorDebugEnumVtable**)DangerousGetPointer();
 
-        public int Skip(ulong celt) => Calli(_this, This[0]->Skip, celt);
+        public int Skip(uint celt) => Calli(_this, This[0]->Skip, celt);
 
         public int Reset() => Calli(_this, This[0]->Reset);
 
         public int Clone(out CorDebugEnum ppEnum)
             => InvokeGetObject(_this, This[0]->Clone, out ppEnum);
 
-        public int GetCount(out ulong celt)
+        public int GetCount(out uint celt)
         {
-            fixed (ulong* count = &celt) return Calli(_this, This[0]->GetCount, count);
+            fixed (uint* count = &celt) return Calli(_this, This[0]->GetCount, count);
         }
 
-        public int Next(ulong celt, out void** next, out ulong celtFetched)
+        public int Next(uint celt, void*** next, out uint celtFetched)
         {
-            fixed (void*** pNext = &next)
-            fixed (ulong* pCeltFetched = &celtFetched)
+            fixed (uint* pCeltFetched = &celtFetched)
             {
-                return Calli(_this, This[0]->Next, celt, (void**)pNext, pCeltFetched);
+                return Calli(_this, This[0]->Next, celt, next, pCeltFetched);
             }
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugEnumVtable
+        private protected unsafe struct ICorDebugEnumVtable
         {
             public IUnknownVtable IUnknown;
 
@@ -47,14 +49,103 @@ namespace ClrDebug.Native
         }
     }
 
-    public unsafe class CorDebugEnum<T> : CorDebugEnum
+    public class CorDebugEnum<T> : CorDebugEnum, IEnumerable<T>
         where T : IComReference, new()
     {
-        public int Next(ulong celt, out T next, out ulong celtFetched)
+        public unsafe int Clone(out CorDebugEnum<T> ppEnum) => InvokeGetObject(_this, This[0]->Clone, out ppEnum);
+
+        public ReadOnlySpan<T> ToSpan()
         {
-            int result = Next(celt, out void** pNext, out celtFetched);
-            next = ComFactory.Create<T>(pNext);
+            GetCount(out uint uCount).MaybeThrowHr();
+            int count = unchecked((int)uCount);
+            var result = new T[count].AsSpan();
+            Next(result, out count).MaybeThrowHr();
+            return result.Slice(0, count);
+        }
+
+        public T[] ToArray()
+        {
+            GetCount(out uint uCount).MaybeThrowHr();
+            int count = unchecked((int)uCount);
+            var result = new T[count];
+            Next(result, out count).MaybeThrowHr();
+            if (result.Length != count)
+            {
+                Array.Resize(ref result, count);
+            }
+
             return result;
+        }
+
+        public unsafe int Next(Span<T> next, out int amountWritten)
+        {
+            int count = next.Length;
+            Span<IntPtr> buffer = count < 60 ? stackalloc IntPtr[count] : new IntPtr[count];
+
+            fixed (IntPtr* pBuffer = buffer)
+            {
+                var b = (void***)pBuffer;
+                int result = Next(unchecked((uint)count), b, out uint celtFetched);
+                amountWritten = unchecked((int)celtFetched);
+                for (int i = 0; i < amountWritten; i++)
+                {
+                    next[i] = ComFactory.Create<T>(b[i]);
+                }
+
+                return result;
+            }
+        }
+
+        public Enumerator GetEnumerator() => new Enumerator(this);
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public struct Enumerator : IEnumerator<T>
+        {
+            private readonly CorDebugEnum<T> _parent;
+
+            private unsafe void** _ptr;
+
+            private T _obj;
+
+            internal unsafe Enumerator(CorDebugEnum<T> parent)
+            {
+                parent.Clone(out _parent).MaybeThrowHr();
+                if (_parent == null)
+                {
+                    throw new ArgumentException(
+                        "Unable to clone enumerator.",
+                        nameof(parent));
+                }
+
+                _ptr = default;
+                _obj = default;
+            }
+
+            private static unsafe T CreateComObject(void** ptr)
+                => ptr == null
+                    ? default
+                    : ComFactory.Create<T>(ptr);
+
+            public unsafe T Current => _obj ??= CreateComObject(_ptr);
+
+            object IEnumerator.Current => Current;
+
+            public unsafe bool MoveNext()
+            {
+                fixed (void*** ptr = &_ptr)
+                {
+                    _obj = default;
+                    _parent.Next(1, ptr, out uint celtFetched);
+                    return celtFetched == 1;
+                }
+            }
+
+            public void Reset() => _parent.Reset().MaybeThrowHr();
+
+            public void Dispose() => _parent.Dispose();
         }
     }
 }
