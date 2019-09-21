@@ -2,7 +2,6 @@
 
 using static ClrDebug.UnsafeOps;
 using static ClrDebug.CalliInstructions;
-using System;
 
 namespace ClrDebug.Native
 {
@@ -19,6 +18,9 @@ namespace ClrDebug.Native
         public int GetFunction(out CorDebugFunction function)
             => InvokeGetObject(_this, This[0]->GetFunction, out function);
 
+        public int GetFunctionToken(out int token)
+            => InvokeGet(_this, This[0]->GetFunctionToken, out token);
+
         public int GetStackRange(out ulong start, out ulong end)
         {
             ulong ref0 = default;
@@ -33,6 +35,12 @@ namespace ClrDebug.Native
         public int GetCaller(out CorDebugFrame frame)
             => InvokeGetObject(_this, This[0]->GetCaller, out frame);
 
+        public int GetCallee(out CorDebugFrame frame)
+            => InvokeGetObject(_this, This[0]->GetCallee, out frame);
+
+        public int CreateStepper(out CorDebugStepper stepper)
+            => InvokeGetObject(_this, This[0]->CreateStepper, out stepper);
+
         [StructLayout(LayoutKind.Sequential)]
         private unsafe struct ICorDebugFrameVtable
         {
@@ -44,9 +52,15 @@ namespace ClrDebug.Native
 
             public void* GetFunction;
 
+            public void* GetFunctionToken;
+
             public void* GetStackRange;
 
             public void* GetCaller;
+
+            public void* GetCallee;
+
+            public void* CreateStepper;
         }
     }
 }

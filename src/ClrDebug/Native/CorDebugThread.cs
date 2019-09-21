@@ -16,6 +16,8 @@ namespace ClrDebug.Native
 
         public int GetHandle(out IntPtr hThreadHandle) => InvokeGet(_this, This[0]->GetHandle, out hThreadHandle);
 
+        public int GetAppDomain(out CorDebugAppDomain appDomain) => InvokeGetObject(_this, This[0]->GetAppDomain, out appDomain);
+
         public int SetDebugState(CorDebugThreadState state) => Calli(_this, This[0]->SetDebugState, (int)state);
 
         public int GetDebugState(out CorDebugThreadState state)
@@ -63,6 +65,8 @@ namespace ClrDebug.Native
             public void* GetID;
 
             public void* GetHandle;
+
+            public void* GetAppDomain;
 
             public void* SetDebugState;
 
