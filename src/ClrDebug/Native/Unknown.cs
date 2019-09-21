@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
@@ -80,7 +80,7 @@ namespace ClrDebug.Native
             _this = ptr;
         }
 
-        internal ComPointer AquirePointer()
+        internal ComPointer AcquirePointer()
         {
             return new ComPointer(this);
         }
@@ -102,8 +102,11 @@ namespace ClrDebug.Native
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!_isDisposed)
+            if (_isDisposed)
             {
+                return;
+            }
+
                 if (disposing)
                 {
                 }
@@ -118,7 +121,6 @@ namespace ClrDebug.Native
                 _isDisposed = true;
             }
         }
-    }
 
     [StructLayout(LayoutKind.Sequential)]
     internal unsafe struct IUnknownVtable

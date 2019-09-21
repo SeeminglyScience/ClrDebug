@@ -18,7 +18,7 @@ namespace ClrDebug.Native
 
         public int HasQueuedCallbacks(CorDebugThread thread, out bool bQueuedRef)
         {
-            using var pThread = thread.AquirePointer();
+            using var pThread = thread.AcquirePointer();
             int pbQueuedRef = default;
             int result = Calli(_this, This[0]->HasQueuedCallbacks, (void*)pThread, &pbQueuedRef);
             bQueuedRef = pbQueuedRef.FromNativeBool();
@@ -30,7 +30,7 @@ namespace ClrDebug.Native
 
         public int SetAllThreadsDebugState(CorDebugThreadState state, CorDebugThread exceptThisThread)
         {
-            using var pExceptThisThread = exceptThisThread?.AquirePointer();
+            using var pExceptThisThread = exceptThisThread?.AcquirePointer();
             return Calli(_this, This[0]->SetAllThreadsDebugState, (int)state, pExceptThisThread);
         }
 
@@ -44,7 +44,7 @@ namespace ClrDebug.Native
             out CorDebugEnum<CorDebugEditAndContinueErrorInfo> error)
         {
             void* pError = default;
-            using var pSnapshots = NativeArray.Alloc(snapshots);
+            using var pSnapshots = NativeArray.AllocCom(snapshots);
             int result = Calli(_this, This[0]->CanCommitChanges, cSnapshots, pSnapshots, &pError);
             error = ComFactory.Create<CorDebugEnum<CorDebugEditAndContinueErrorInfo>>((void**)pError);
             return result;
@@ -56,7 +56,7 @@ namespace ClrDebug.Native
             out CorDebugEnum<CorDebugEditAndContinueErrorInfo> error)
         {
             void* pError = default;
-            using var pSnapshots = NativeArray.Alloc(snapshots);
+            using var pSnapshots = NativeArray.AllocCom(snapshots);
             int result = Calli(_this, This[0]->CommitChanges, cSnapshots, pSnapshots, &pError);
             error = ComFactory.Create<CorDebugEnum<CorDebugEditAndContinueErrorInfo>>((void**)pError);
             return result;

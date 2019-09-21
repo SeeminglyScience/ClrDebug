@@ -14,7 +14,7 @@ namespace ClrDebug.Native
 
         public int GetFieldValue(CorDebugClass @class, uint fieldDef, out CorDebugValue value)
         {
-            using var pClass = @class.AquirePointer();
+            using var pClass = @class.AcquirePointer();
             void** pValue = default;
             int result = Calli(_this, This[0]->GetFieldValue, pClass, fieldDef, &pValue);
             ComFactory.Create(pValue, out value);
@@ -37,7 +37,7 @@ namespace ClrDebug.Native
 
         public int SetFromManagedCopy(Unknown @object)
         {
-            using var pObject = @object.AquirePointer();
+            using var pObject = @object.AcquirePointer();
             return Calli(_this, This[0]->SetFromManagedCopy, pObject);
         }
 

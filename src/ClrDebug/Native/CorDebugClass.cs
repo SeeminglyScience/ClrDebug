@@ -17,7 +17,7 @@ namespace ClrDebug.Native
 
         public int GetStaticFieldValue(uint fieldDef, CorDebugFrame frame, out CorDebugValue value)
         {
-            using var pFrame = frame.AquirePointer();
+            using var pFrame = frame.AcquirePointer();
             void* pValue = default;
             int result = Calli(_this, This[0]->GetStaticFieldValue, fieldDef, pFrame, &pValue);
             ComFactory.Create(pValue, out value);

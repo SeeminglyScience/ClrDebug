@@ -5,29 +5,29 @@ namespace ClrDebug.Native
 {
     internal static class NativeArray
     {
-        public static NativeArray<T> Alloc<T>(ReadOnlySpan<T> managedArray) where T : IComReference, IUnknown
+        public static NativeComArray<T> AllocCom<T>(ReadOnlySpan<T> managedArray) where T : IComReference, IUnknown
         {
-            return NativeArray<T>.Alloc(managedArray);
+            return NativeComArray<T>.Alloc(managedArray);
         }
     }
 
-    internal readonly unsafe ref struct NativeArray<T> where T : IComReference, IUnknown
+    internal readonly unsafe ref struct NativeComArray<T> where T : IComReference, IUnknown
     {
         public readonly void*** Pointer;
 
         private readonly ReadOnlySpan<T> _managed;
 
-        private NativeArray(void*** array, ReadOnlySpan<T> managed)
+        private NativeComArray(void*** array, ReadOnlySpan<T> managed)
         {
             Pointer = array;
             _managed = managed;
         }
 
-        public static implicit operator void*(NativeArray<T> nativeArray) => nativeArray.Pointer;
+        public static implicit operator void*(NativeComArray<T> nativeArray) => nativeArray.Pointer;
 
-        public static explicit operator void**(NativeArray<T> nativeArray) => (void**)nativeArray.Pointer;
+        public static explicit operator void**(NativeComArray<T> nativeArray) => (void**)nativeArray.Pointer;
 
-        public static implicit operator void***(NativeArray<T> nativeArray) => nativeArray.Pointer;
+        public static implicit operator void***(NativeComArray<T> nativeArray) => nativeArray.Pointer;
 
         public void Dispose()
         {
@@ -43,7 +43,7 @@ namespace ClrDebug.Native
             }
         }
 
-        public static NativeArray<T> Alloc(ReadOnlySpan<T> managedArray)
+        public static NativeComArray<T> Alloc(ReadOnlySpan<T> managedArray)
         {
             if (managedArray.IsEmpty)
             {
@@ -61,7 +61,7 @@ namespace ClrDebug.Native
                     ptr[i] = managedArray[i].DangerousGetPointer();
                 }
 
-                return new NativeArray<T>(ptr, managedArray);
+                return new NativeComArray<T>(ptr, managedArray);
             }
             catch
             {

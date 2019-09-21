@@ -12,19 +12,19 @@ namespace ClrDebug.Native
 
         public int CallFunction(CorDebugFunction function, ReadOnlySpan<CorDebugValue> args)
         {
-            using var pArgs = NativeArray.Alloc(args);
+            using var pArgs = NativeArray.AllocCom(args);
             return Calli(_this, This[0]->CallFunction, function, (void**)pArgs);
         }
 
         public int NewObject(CorDebugFunction constructor, ReadOnlySpan<CorDebugValue> args)
         {
-            using var pArgs = NativeArray.Alloc(args);
+            using var pArgs = NativeArray.AllocCom(args);
             return Calli(_this, This[0]->NewObject, constructor, (void**)pArgs);
         }
 
         public int NewObjectNoConstructor(CorDebugClass @class)
         {
-            using var pClass = @class.AquirePointer();
+            using var pClass = @class.AcquirePointer();
             return Calli(_this, This[0]->NewObjectNoConstructor, pClass);
         }
 
@@ -46,7 +46,7 @@ namespace ClrDebug.Native
             fixed (void* pDims = dims)
             fixed (void* pLowBounds = lowBounds)
             {
-                using var pElementClass = elementClass.AquirePointer();
+                using var pElementClass = elementClass.AcquirePointer();
                 return Calli(_this, This[0]->NewArray, (int)elementType, pElementClass, rank, pDims, pLowBounds);
             }
         }
@@ -61,7 +61,7 @@ namespace ClrDebug.Native
 
         public int CreateValue(CorElementType elementType, CorDebugClass elementClass, out CorDebugValue value)
         {
-            using var pElementClass = elementClass.AquirePointer();
+            using var pElementClass = elementClass.AcquirePointer();
             void* pValue = default;
             int result = Calli(_this, This[0]->CreateValue, (int)elementType, pElementClass, &pValue);
             ComFactory.Create((void**)pValue, out value);
