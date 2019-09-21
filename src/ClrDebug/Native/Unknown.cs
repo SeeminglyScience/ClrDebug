@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
@@ -78,6 +78,7 @@ namespace ClrDebug.Native
             }
 
             _this = ptr;
+            Calli(_this, This[0]->AddRef);
         }
 
         internal ComPointer AcquirePointer()
@@ -107,20 +108,20 @@ namespace ClrDebug.Native
                 return;
             }
 
-                if (disposing)
-                {
-                }
-
-                IUnknownVtable** vtablePtr = This;
-                _this = default;
-                if (vtablePtr != default)
-                {
-                    Calli(vtablePtr, vtablePtr[0]->Release);
-                }
-
-                _isDisposed = true;
+            if (disposing)
+            {
             }
+
+            IUnknownVtable** vtablePtr = This;
+            _this = default;
+            if (vtablePtr != default)
+            {
+                Calli(vtablePtr, vtablePtr[0]->Release);
+            }
+
+            _isDisposed = true;
         }
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     internal unsafe struct IUnknownVtable
