@@ -30,7 +30,7 @@ namespace ClrDebug
             void** pValue = default;
             int result = Calli(@this, slot, &pValue);
             value = default;
-            if (pValue != null)
+            if (result == 0 && pValue != null)
             {
                 value = new T();
                 value.SetPointer(pValue);
