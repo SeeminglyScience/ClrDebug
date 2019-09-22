@@ -31,7 +31,7 @@ namespace ClrDebug.Native
         /// and treated as <c>INFINITE</c> (-1). If the cooperative stop fails due to a deadlock, all
         /// threads are suspended and <c>E_TIMEOUT</c> is returned.
         /// </remarks>
-        public void Stop(int dwTimeoutIgnored) => Calli(_this, This[0]->Stop, dwTimeoutIgnored).MaybeThrowHr();
+        public int Stop(int dwTimeoutIgnored) => Calli(_this, This[0]->Stop, dwTimeoutIgnored);
 
         /// <summary>
         /// Resumes execution of managed threads after a call to <see cref="Stop(int)" />.
@@ -67,15 +67,6 @@ namespace ClrDebug.Native
         /// Gets a value that indicates whether the threads in the process are currently running freely.
         /// </summary>
         public int IsRunning(out bool bRunning) => InvokeGet(_this, This[0]->IsRunning, out bRunning);
-
-        /// <summary>
-        /// Gets a value that indicates whether the threads in the process are currently running freely.
-        /// </summary>
-        public bool IsRunning()
-        {
-            InvokeGet(_this, This[0]->IsRunning, out bool isRunning).MaybeThrowHr();
-            return isRunning;
-        }
 
         /// <summary>
         /// Gets a value that indicates whether any managed callbacks are currently queued for

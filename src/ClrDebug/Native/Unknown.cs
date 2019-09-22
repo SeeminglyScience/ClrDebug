@@ -55,7 +55,7 @@ namespace ClrDebug.Native
         {
             void* ppvObject;
             int result = QueryInterface(riid, &ppvObject);
-            if (result == CorError.E_NOINTERFACE)
+            if (result == HResult.E_NOINTERFACE)
             {
                 comObject = default;
                 return false;

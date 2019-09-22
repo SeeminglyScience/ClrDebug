@@ -278,7 +278,7 @@ namespace ClrDebug
         {
             if (ppvObject == default)
             {
-                return CorError.E_POINTER;
+                return HResult.E_POINTER;
             }
 
             if (riid == CorGuids.IUnknown)
@@ -299,7 +299,7 @@ namespace ClrDebug
                 return 0;
             }
 
-            return CorError.E_NOINTERFACE;
+            return HResult.E_NOINTERFACE;
         }
 
         public virtual unsafe int AddRef(void* @this) => Interlocked.Increment(ref _refCount);
