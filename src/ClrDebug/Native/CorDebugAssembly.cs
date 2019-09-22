@@ -10,15 +10,25 @@ namespace ClrDebug.Native
     {
         private ICorDebugAssemblyVtable** This => (ICorDebugAssemblyVtable**)DangerousGetPointer();
 
+        /// <summary>
+        /// Gets the process in which this instance is running.
+        /// </summary>
         public int GetProcess(out CorDebugProcess process)
             => InvokeGetObject(_this, This[0]->GetProcess, out process);
 
+        /// <summary>
+        /// Gets the application domain that contains this instance.
+        /// </summary>
         public int GetAppDomain(out CorDebugAppDomain appDomain)
             => InvokeGetObject(_this, This[0]->GetAppDomain, out appDomain);
 
+        /// <summary>
+        /// The modules contained in this instance.
+        /// </summary>
         public int EnumerateModules(out CorDebugEnum<CorDebugModule> modules)
             => InvokeGetObject(_this, This[0]->EnumerateModules, out modules);
 
+        [Obsolete("This method is not implemented in the current version of the .NET Framework.")]
         public int GetCodeBase(ref Span<char> szName, out uint charsUsed)
         {
             fixed (void* pszName = szName)
@@ -28,6 +38,10 @@ namespace ClrDebug.Native
             }
         }
 
+        /// <summary>
+        /// Gets the name of the assembly that this ICorDebugAssembly instance represents.
+        /// </summary>
+        /// <remarks>The name returned is the full path and file name of the assembly.</remarks>
         public int GetName(ref Span<char> szName, out uint charsUsed)
         {
             fixed (void* pszName = szName)

@@ -5,20 +5,37 @@ using System.Runtime.InteropServices;
 
 using static ClrDebug.UnsafeOps;
 using static ClrDebug.CalliInstructions;
+using System.ComponentModel;
 
 namespace ClrDebug.Native
 {
+    /// <summary>
+    /// Serves as the abstract base interface for the enumerators that are used by a
+    /// debugging application.
+    /// </summary>
     public unsafe class CorDebugEnum : Unknown
     {
         private protected ICorDebugEnumVtable** This => (ICorDebugEnumVtable**)DangerousGetPointer();
 
+        /// <summary>
+        /// Moves the cursor forward in the enumeration by the specified number of items.
+        /// </summary>
         public int Skip(uint celt) => Calli(_this, This[0]->Skip, celt);
 
+        /// <summary>
+        /// Moves the cursor to the beginning of the enumeration.
+        /// </summary>
         public int Reset() => Calli(_this, This[0]->Reset);
 
+        /// <summary>
+        /// Creates a copy of this object.
+        /// </summary>
         public int Clone(out CorDebugEnum ppEnum)
             => InvokeGetObject(_this, This[0]->Clone, out ppEnum);
 
+        /// <summary>
+        /// Gets the number of items in the enumeration.
+        /// </summary>
         public int GetCount(out uint celt)
         {
             fixed (uint* count = &celt) return Calli(_this, This[0]->GetCount, count);
@@ -49,11 +66,20 @@ namespace ClrDebug.Native
         }
     }
 
+    /// <summary>
+    /// Represents any non-abstract interface that inherits ICorDebugEnum.
+    /// </summary>
     public class CorDebugEnum<T> : CorDebugEnum, IEnumerable<T>
         where T : IComReference, new()
     {
+        /// <summary>
+        /// Creates a copy of this object.
+        /// </summary>
         public unsafe int Clone(out CorDebugEnum<T> ppEnum) => InvokeGetObject(_this, This[0]->Clone, out ppEnum);
 
+        /// <summary>
+        /// Creates a span from the COM enumerator.
+        /// </summary>
         public ReadOnlySpan<T> ToSpan()
         {
             GetCount(out uint uCount).MaybeThrowHr();
@@ -63,6 +89,9 @@ namespace ClrDebug.Native
             return result.Slice(0, count);
         }
 
+        /// <summary>
+        /// Creates an array from the COM enumerator.
+        /// </summary>
         public T[] ToArray()
         {
             GetCount(out uint uCount).MaybeThrowHr();
@@ -77,11 +106,16 @@ namespace ClrDebug.Native
             return result;
         }
 
+        /// <summary>
+        /// Gets the specified number of <see cref="T" /> objects from the enumeration, starting
+        /// at the current position.
+        /// </summary>
+        /// <param name="next">The destination buffer.</param>
+        /// <param name="amountWritten">The amount of objects written to <see paramref="next" />.</param>
         public unsafe int Next(Span<T> next, out int amountWritten)
         {
             int count = next.Length;
             Span<IntPtr> buffer = count < 60 ? stackalloc IntPtr[count] : new IntPtr[count];
-
             fixed (IntPtr* pBuffer = buffer)
             {
                 var b = (void***)pBuffer;
@@ -102,6 +136,7 @@ namespace ClrDebug.Native
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public struct Enumerator : IEnumerator<T>
         {
             private readonly CorDebugEnum<T> _parent;

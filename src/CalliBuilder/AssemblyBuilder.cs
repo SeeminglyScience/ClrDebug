@@ -22,6 +22,7 @@ namespace CalliBuilder
             new[] { typeof(int), typeof(void*) },
             new[] { typeof(int), typeof(void*), typeof(void*) },
             new[] { typeof(int), typeof(void*), typeof(uint) },
+            new[] { typeof(int), typeof(void*), typeof(int) },
             new[] { typeof(int), typeof(void*), typeof(uint), typeof(void*), typeof(void*) },
             new[] { typeof(void*) },
             new[] { typeof(void*), typeof(void*) },
@@ -29,6 +30,8 @@ namespace CalliBuilder
             new[] { typeof(void*), typeof(int) },
             new[] { typeof(void*), typeof(uint), typeof(void*) },
             new[] { typeof(ulong) },
+            new[] { typeof(ulong), typeof(int), typeof(void*) },
+            new[] { typeof(ulong), typeof(int), typeof(void*), typeof(void*) },
             new[] { typeof(ulong), typeof(void*) },
             new[] { typeof(ulong), typeof(void*), typeof(void*) },
             new[] { typeof(uint), typeof(int) },
@@ -36,7 +39,7 @@ namespace CalliBuilder
             new[] { typeof(uint), typeof(void*), typeof(void*) },
             new[] { typeof(uint), typeof(int), typeof(void*) },
 
-            new[] { typeof(uint), typeof(uint), typeof(uint), typeof(void*), typeof(void*) },
+            new[] { typeof(uint), typeof(uint), typeof(int), typeof(void*), typeof(void*) },
             // ICorDebug.CreateProcess
             new[]
             {

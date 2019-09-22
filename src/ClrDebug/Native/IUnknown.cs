@@ -2,12 +2,129 @@ using System;
 
 namespace ClrDebug.Native
 {
+
+    /// <summary>
+    /// Enables clients to get pointers to other interfaces on
+    /// a given object through the <see cref="QueryInterface(Guid, void**)" />
+    /// method, and manage the existence of the object through the
+    /// <see cref="AddRef" /> and <see cref="Release" /> methods.
+    /// All other COM interfaces are inherited, directly or indirectly,
+    /// from <see cref="IUnknown" />. Therefore, the three methods
+    /// in <see cref="IUnknown" /> are the first entries in the vtable
+    /// for every interface.
+    /// </summary>
     public interface IUnknown
     {
+        /// <summary>
+        /// Queries a COM object for a pointer to one of its interface;
+        /// identifying the interface by a reference to its interface
+        /// identifier (IID). If the COM object implements the interface,
+        /// then it returns a pointer to that interface after calling
+        /// <see cref="AddRef" /> on it.
+        /// </summary>
+        /// <param name="riid">
+        /// A reference to the interface identifier (IID) of the interface
+        /// being queried for.
+        /// </param>
+        /// <param name="ppvObject">
+        /// The address of a pointer to an interface with the IID specified
+        /// in the riid parameter. Because you pass the address of an
+        /// interface pointer, the method can overwrite that address with
+        /// the pointer to the inteface being queried for. Upon successful
+        /// return, the dereferenced address will contain a pointer to the
+        /// requested interface. If the object doesn't support the interface,
+        /// the method sets the dereferenced address to <see langword="null" />.
+        /// </param>
+        /// <returns>
+        /// This method returns <see cref="HResult.S_OK" /> if the interface
+        /// is supported, and <see cref="HResult.E_NOINTERFACE" /> otherwise.
+        /// If <see paramref="ppvObject" /> is <see langword="null" />, then
+        /// this method returns <see cref="HResult.E_POINTER" />.
+        /// </returns>
+        /// <remarks>
+        /// For any given COM object (also known as a COM component), a specific
+        /// query for the <see cref="IUnknown" /> interface on any of the object's
+        /// interfaces must always return the same pointer value. This enables a
+        /// client to determine whether two pointers point to the same component
+        /// by calling <see cref="QueryInterface(Guid, void**)" /> with <see cref="CorGuids.IUnknown" />
+        /// and comparing the results. It is specifically not the case that queries
+        /// for interfaces other than <see cref="IUnknown" /> (even the same
+        /// interface through the same pointer) must return the same pointer value.
+        ///
+        /// There are four requirements for implementations of <see cref="QueryInterface(Guid, void**)" />
+        /// (In these cases, "must succeed" means "must succeed barring catastrophic
+        /// failure.").
+        ///
+        /// - The set of interfaces accessible on an object through <see cref="QueryInterface(Guid, void**)" />
+        ///   must be static, not dynamic. This means that if a call to <see cref="QueryInterface(Guid, void**)" />
+        ///   for a pointer to a specified interface succeeds the first time, then
+        ///   it must succeed again. If the call fails the first time, then it must
+        ///   fail on all subsequent calls.
+        ///
+        /// - It must be reflexive—if a client holds a pointer to an interface on
+        ///   an object, and the client queries for that interface, then the call must
+        ///   succeed.
+        ///
+        /// - It must be symmetric—if a client holding a pointer to one interface
+        ///   queries successfully for another, then a query through the obtained pointer
+        ///   for the first interface must succeed.
+        ///
+        /// - It must be transitive—if a client holding a pointer to one interface
+        ///   queries successfully for a second, and through that pointer queries
+        ///   successfully for a third interface, then a query for the first interface
+        ///   through the pointer for the third interface must succeed.
+        /// </remarks>
         unsafe int QueryInterface(Guid riid, void** ppvObject);
 
+        /// <summary>
+        /// Increments the reference count for an interface pointer to a
+        /// COM object. You should call this method whenever you make a
+        /// copy of an interface pointer
+        /// </summary>
+        /// <returns>
+        /// The method returns the new reference count. This value is intended
+        /// to be used only for test purposes.
+        /// </returns>
+        /// <remarks>
+        /// A COM object uses a per-interface reference-counting mechanism
+        /// to ensure that the object doesn't outlive references to it. You
+        /// use <see cref="AddRef" /> to stabilize a copy of an interface
+        /// pointer. It can also be called when the life of a cloned pointer
+        /// must extend beyond the lifetime of the original pointer. The
+        /// cloned pointer must be released by calling <see cref="Release" />
+        /// on it.
+        ///
+        /// The internal reference counter that <see cref="AddRef" /> maintains
+        /// should be a 32-bit unsigned integer.
+        ///
+        /// Notes to callers:
+        ///
+        /// Call this method for every new copy of an interface pointer that
+        /// you make. For example, if you return a copy of a pointer from a
+        /// method, then you must call <see cref="AddRef" /> on that pointer.
+        /// You must also call <see cref="AddRef" /> on a pointer before passing
+        /// it as an in-out parameter to a method; the method will call <see cref="Release" />
+        /// before copying the out-value on top of it.
+        /// </remarks>
         int AddRef();
 
+        /// <summary>
+        /// Decrements the reference count for an interface on a COM object.
+        /// </summary>
+        /// <returns>
+        /// The method returns the new reference count. This value is intended
+        /// to be used only for test purposes.
+        /// </returns>
+        /// <remarks>
+        /// When the reference count on an object reaches zero, Release must
+        /// cause the interface pointer to free itself. When the released pointer
+        /// is the only (formerly) outstanding reference to an object (whether
+        /// the object supports single or multiple interfaces), the implementation
+        /// must free the object.
+        ///
+        /// Note that aggregation of objects restricts the ability to recover
+        /// interface pointers.
+        /// </remarks>
         int Release();
     }
 }

@@ -6,10 +6,12 @@ using static ClrDebug.CalliInstructions;
 
 namespace ClrDebug.Native
 {
+    [Obsolete("This class is obsolete.")]
     public unsafe class CorDebugEditAndContinueSnapshot : Unknown
     {
         private ICorDebugEditAndContinueSnapshotVtable** This => (ICorDebugEditAndContinueSnapshotVtable**)DangerousGetPointer();
 
+        [Obsolete("This method is obsolete.", error: true)]
         public int CopyMetaData(void* stream, out Guid mvid)
         {
             Guid pMvid = default;
@@ -18,6 +20,7 @@ namespace ClrDebug.Native
             return result;
         }
 
+        [Obsolete("This method is obsolete.", error: true)]
         public int GetMvid(out Guid mvid)
         {
             Guid pMvid = default;
@@ -26,12 +29,16 @@ namespace ClrDebug.Native
             return result;
         }
 
+        [Obsolete("This method is obsolete.", error: true)]
         public int GetRoDataRVA(out uint roDataRVA) => InvokeGet(_this, This[0]->GetRoDataRVA, out roDataRVA);
 
+        [Obsolete("This method is obsolete.", error: true)]
         public int GetRwDataRVA(out uint rwDataRVA) => InvokeGet(_this, This[0]->GetRwDataRVA, out rwDataRVA);
 
+        [Obsolete("This method is obsolete.", error: true)]
         public int SetPEBytes(in void* stream) => Calli(_this, This[0]->SetPEBytes, stream);
 
+        [Obsolete("This method is obsolete.", error: true)]
         public int SetILMap(uint mdFunction, in ReadOnlySpan<COR_IL_MAP> map)
         {
             fixed (void* pMap = map)
@@ -40,6 +47,7 @@ namespace ClrDebug.Native
             }
         }
 
+        [Obsolete("This method is obsolete.", error: true)]
         public int SetPESymbolBytes(void* stream) => Calli(_this, This[0]->SetPESymbolBytes, stream);
 
         [StructLayout(LayoutKind.Sequential)]
