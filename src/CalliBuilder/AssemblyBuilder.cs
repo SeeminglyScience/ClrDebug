@@ -48,7 +48,7 @@ namespace CalliBuilder
                 /* lpProcessAttributes:  */ typeof(void*),
                 /* lpThreadAttributes:   */ typeof(void*),
                 /* bInheritHandles:      */ typeof(int),
-                /* dwCreationFlags:      */ typeof(ulong),
+                /* dwCreationFlags:      */ typeof(uint),
                 /* lpEnvironment:        */ typeof(void*),
                 /* lpCurrentDirectory:   */ typeof(void*),
                 /* lpStartupInfo:        */ typeof(void*),

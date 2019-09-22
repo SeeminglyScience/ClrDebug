@@ -21,7 +21,7 @@ namespace ClrDebug.Native
         public int GetErrorCode(out long hr) => InvokeGet(_this, This[0]->GetErrorCode, out hr);
 
         [Obsolete("This method is obsolete.", error: true)]
-        public int GetString(ref Span<char> szString, out uint charsUsed)
+        public int GetString(Span<char> szString, out uint charsUsed)
         {
             fixed (void* pCharsUsed = &charsUsed)
             fixed (void* pSzString = szString)

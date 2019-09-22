@@ -1,12 +1,30 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 using static ClrDebug.UnsafeOps;
 using static ClrDebug.CalliInstructions;
-using System.Runtime.InteropServices;
-using System.ComponentModel;
 
 namespace ClrDebug.Native
 {
+    /// <summary>
+    /// Provides methods that allow developers to debug applications in the
+    /// common language runtime (CLR) environment.
+    /// </summary>
+    /// <remarks>
+    /// This class represents an event processing loop for a debugger process.
+    /// The debugger must wait for the <c>ICorDebugManagedCallback::ExitProcess</c>
+    /// callback from all processes being debugged before releasing this interface.
+    ///
+    /// The <see cref="CorDebug" /> object is the initial object to control all
+    /// further managed debugging. In the .NET Framework versions 1.0 and 1.1,
+    /// this object was a CoClass object created from COM. In the .NET Framework
+    /// version 2.0, this object is no longer a CoClass object. It must be created
+    /// by the <c>CreateDebuggingInterfaceFromVersion</c> function, which is more
+    /// version-aware. This new creation function enables clients to get a specific
+    /// implementation of <c>ICorDebug</c>, which also emulates a specific version
+    /// of the debugging API.
+    /// </remarks>
     public unsafe class CorDebug : Unknown
     {
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -21,13 +39,11 @@ namespace ClrDebug.Native
         /// services. This method must be called before any other method on <see cref="ICorDebug" />
         /// is called.
         /// </summary>
-        /// <returns>The HRESULT if the method fails, otherwise zero.</returns>
         public int Initialize() => Calli(_this, This[0]->Initialize);
 
         /// <summary>
         /// Must be called when the <see cref="CorDebug" /> object is no longer needed.
         /// </summary>
-        /// <returns>The HRESULT if the method fails, otherwise zero.</returns>
         public int Terminate() => Calli(_this, This[0]->Terminate);
 
         /// <summary>
@@ -37,13 +53,12 @@ namespace ClrDebug.Native
         /// A pointer to an <see cref="CorDebugManagedCallback" /> object, which is the event
         /// handler object.
         /// </param>
-        /// <returns>The HRESULT if the method fails, otherwise zero.</returns>
         /// <remarks>
         /// Must be called at creation time.
         ///
         /// If the <see cref="CorDebugManagedCallback" /> implementation does not contain
         /// sufficient interfaces to handle debugging events for the application that is being
-        /// debugged, <see cref="SetManagedHandler" /> returns an HRESULT of E_NOINTERFACE.
+        /// debugged, <see cref="SetManagedHandler" /> returns <see cref="HResult.E_NOINTERFACE" />.
         /// </remarks>
         public int SetManagedHandler(CorDebugManagedCallback* pCallback)
             => Calli(_this, This[0]->SetManagedHandler, pCallback);
@@ -55,7 +70,6 @@ namespace ClrDebug.Native
         /// A pointer to an <see cref="CorDebugUnmanagedCallback" /> object that represents the
         /// event handler for unmanaged events.
         /// </param>
-        /// <returns>The HRESULT if the method fails, otherwise zero.</returns>
         public int SetUnmanagedHandler(void* pCallback)
             => Calli(_this, This[0]->SetUnmanagedHandler, pCallback);
 
@@ -108,7 +122,6 @@ namespace ClrDebug.Native
         /// <param name="pProcess">
         /// The <see cref="CorDebugProcess" /> object that represents the created process.
         /// </param>
-        /// <returns>The HRESULT if the method fails, otherwise zero.</returns>
         /// <remarks>
         /// The parameters of this method are the same as those of the Win32 CreateProcess method.
         ///
@@ -126,14 +139,14 @@ namespace ClrDebug.Native
         /// and AMD64-based platforms.
         /// </remarks>
         public int CreateProcess(
-            in ReadOnlySpan<char> lpApplicationName,
-            in ReadOnlySpan<char> lpCommandLine,
+            ReadOnlySpan<char> lpApplicationName,
+            ReadOnlySpan<char> lpCommandLine,
             in SECURITY_ATTRIBUTES lpProcessAttributes,
             in SECURITY_ATTRIBUTES lpThreadAttributes,
             int bInheritHandles,
-            ulong dwCreationFlags,
+            uint dwCreationFlags,
             void* lpEnvironment,
-            in ReadOnlySpan<char> lpCurrentDirectory,
+            ReadOnlySpan<char> lpCurrentDirectory,
             in STARTUPINFOW lpStartupInfo,
             in PROCESS_INFORMATION lpProcessInformation,
             CorDebugCreateProcessFlags debuggingFlags,
@@ -182,7 +195,6 @@ namespace ClrDebug.Native
         /// <param name="process">
         /// The process to which the debugger has been attached.
         /// </param>
-        /// <returns>The HRESULT if the method fails, otherwise zero.</returns>
         public int DebugActiveProcess(uint id, bool win32Attach, out CorDebugProcess process)
         {
             void* pProcess = default;
@@ -191,11 +203,7 @@ namespace ClrDebug.Native
             return result;
         }
 
-        /// <summary>Gets an enumerator for the processes that are being debugged.</summary>
-        /// <param name="process">
-        /// The processes being debugged.
-        /// </param>
-        /// <returns>The HRESULT if the method fails, otherwise zero.</returns>
+        /// <summary>Gets the processes that are being debugged.</summary>
         public int EnumerateProcesses(out CorDebugEnum process)
             => InvokeGetObject(_this, This[0]->EnumerateProcesses, out process);
 
@@ -204,7 +212,6 @@ namespace ClrDebug.Native
         /// </summary>
         /// <param name="dwProcessId">The ID of the process.</param>
         /// <param name="process">The instance for the specified process.</param>
-        /// <returns>The HRESULT if the method fails, otherwise zero.</returns>
         public int GetProcess(uint dwProcessId, out CorDebugProcess process)
         {
             void* pProcess = default;
