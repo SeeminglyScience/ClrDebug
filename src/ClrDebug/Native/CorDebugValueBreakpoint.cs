@@ -1,8 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
 using static ClrDebug.UnsafeOps;
-using static ClrDebug.CalliInstructions;
-using System;
 
 namespace ClrDebug.Native
 {
