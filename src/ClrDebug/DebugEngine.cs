@@ -6,17 +6,19 @@ namespace ClrDebug
 {
     public class DebugEngine : IDisposable
     {
-        private CorDebug _debug;
-
-        private CorDebugProcess _process;
-
         private bool _isDisposed;
 
         private ManagedDebuggerCallbacks _callbacks;
 
+        private CorDebugProcess _process;
+
         private DebugEngine()
         {
         }
+
+        public CorDebug CorDebug { get; private set; }
+
+        public CorDebugProcess CorProcess => _process;
 
         ~DebugEngine() => Dispose(false);
 
@@ -47,18 +49,18 @@ namespace ClrDebug
             var engine = new DebugEngine
             {
                 _callbacks = new LoggerManagedCallbacks(),
-                _debug = ComFactory.Create<CorDebug>(ppCordb),
+                CorDebug = ComFactory.Create<CorDebug>(ppCordb),
             };
 
-            engine._debug.Initialize().MaybeThrowHr();
-            engine._debug.SetManagedHandler(engine._callbacks.CallbacksPointer).MaybeThrowHr();
-            engine._debug.DebugActiveProcess(
+            engine.CorDebug.Initialize().MaybeThrowHr();
+            engine.CorDebug.SetManagedHandler(engine._callbacks.CallbacksPointer).MaybeThrowHr();
+            engine.CorDebug.DebugActiveProcess(
                 unchecked((uint)processId),
                 win32Attach: false,
                 out engine._process)
                 .MaybeThrowHr();
 
-            engine._callbacks.Control = engine._process;
+            engine._callbacks.Control = engine.CorProcess;
 
             return engine;
         }
@@ -98,10 +100,10 @@ namespace ClrDebug
             {
             }
 
-            _debug?.Dispose();
-            _process?.Dispose();
+            CorDebug?.Dispose();
+            CorProcess?.Dispose();
             _callbacks?.Dispose();
-            _debug = null;
+            CorDebug = null;
             _process = null;
             _callbacks = null;
 

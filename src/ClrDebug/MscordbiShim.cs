@@ -216,10 +216,10 @@ namespace ClrDebug
 
         private static class NonWindowsInterop
         {
-            [DllImport("libc", SetLastError = true, CharSet = CharSet.Ansi)]
+            [DllImport("libdl", SetLastError = true, CharSet = CharSet.Ansi)]
             public static extern IntPtr dlopen(string file, int mode);
 
-            [DllImport("libc", SetLastError = true, CharSet = CharSet.Ansi)]
+            [DllImport("libdl", SetLastError = true, CharSet = CharSet.Ansi)]
             public static extern IntPtr dlsym(IntPtr handle, string name);
         }
     }

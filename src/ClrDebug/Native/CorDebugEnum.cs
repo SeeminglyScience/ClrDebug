@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 using static ClrDebug.UnsafeOps;
 using static ClrDebug.CalliInstructions;
-using System.ComponentModel;
 
 namespace ClrDebug.Native
 {
