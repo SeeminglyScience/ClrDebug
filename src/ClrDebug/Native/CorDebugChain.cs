@@ -99,7 +99,7 @@ namespace ClrDebug.Native
         /// provide methods for obtaining frames contained in unmanaged chains. The debugger
         /// must use other means to obtain this information.
         /// </remarks>
-        public int EnumerateFrames(out CorDebugEnum<CorDebugFrame> frames)
+        public int EnumerateFrames(out CorDebugComEnum<CorDebugFrame> frames)
             => InvokeGetObject(_this, This[0]->EnumerateFrames, out frames);
 
         /// <summary>

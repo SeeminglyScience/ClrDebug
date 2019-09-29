@@ -28,7 +28,7 @@ namespace ClrDebug.Native
         /// <summary>
         /// Gets the modules contained in this instance.
         /// </summary>
-        public int EnumerateModules(out CorDebugEnum<CorDebugModule> modules)
+        public int EnumerateModules(out CorDebugComEnum<CorDebugModule> modules)
             => InvokeGetObject(_this, This[0]->EnumerateModules, out modules);
 
         [Obsolete("This method is not implemented in the current version of the .NET Framework.")]

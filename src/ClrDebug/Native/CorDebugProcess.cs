@@ -41,7 +41,7 @@ namespace ClrDebug.Native
         }
 
         [Obsolete("This method has not been implemented.")]
-        public int EnumerateObjects(out CorDebugEnum objects)
+        public int EnumerateObjects(out Unknown objects)
             => InvokeGetObject(_this, This[0]->EnumerateObjects, out objects);
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace ClrDebug.Native
         /// This method can be used before the <c>ICorDebugManagedCallback::CreateProcess</c>
         /// callback.
         /// </remarks>
-        public int EnumerateAppDomains(out CorDebugEnum<CorDebugAppDomain> appDomains)
+        public int EnumerateAppDomains(out CorDebugComEnum<CorDebugAppDomain> appDomains)
             => InvokeGetObject(_this, This[0]->EnumerateAppDomains, out appDomains);
 
         [Obsolete("This method has not been implemented.")]

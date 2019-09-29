@@ -44,21 +44,24 @@ namespace ClrDebug.Native
             GC.SuppressFinalize(this);
         }
 
-        public int QueryInterface(Guid riid, void** ppvObject)
+        public int QueryInterface(Guid* riid, void** ppvObject)
             => Calli(_this, This[0]->QueryInterface, riid, ppvObject);
 
         public int AddRef() => Calli(_this, This[0]->AddRef);
 
         public int Release() => Calli(_this, This[0]->Release);
 
-        public bool TryGetInterface<T>(Guid riid, out T comObject) where T : IComReference, new()
+        public bool TryGetInterface<T>(in Guid riid, out T comObject) where T : IComReference, new()
         {
             void* ppvObject;
-            int result = QueryInterface(riid, &ppvObject);
-            if (result == HResult.E_NOINTERFACE)
+            fixed (Guid* pRiid = &riid)
             {
-                comObject = default;
-                return false;
+                int result = QueryInterface(pRiid, &ppvObject);
+                if (result == HResult.E_NOINTERFACE)
+                {
+                    comObject = default;
+                    return false;
+                }
             }
 
             comObject = ComFactory.Create<T>(ppvObject);

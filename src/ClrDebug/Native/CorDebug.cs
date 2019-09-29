@@ -204,7 +204,7 @@ namespace ClrDebug.Native
         }
 
         /// <summary>Gets the processes that are being debugged.</summary>
-        public int EnumerateProcesses(out CorDebugEnum process)
+        public int EnumerateProcesses(out CorDebugComEnum<CorDebugProcess> process)
             => InvokeGetObject(_this, This[0]->EnumerateProcesses, out process);
 
         /// <summary>

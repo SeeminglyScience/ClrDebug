@@ -39,14 +39,16 @@ namespace ClrDebug.Native
         public int CallFunction(CorDebugFunction function, ReadOnlySpan<CorDebugValue> args)
         {
             using var pArgs = NativeArray.AllocCom(args);
-            return Calli(_this, This[0]->CallFunction, function, (void**)pArgs);
+            using var pFunction = function?.AcquirePointer();
+            return Calli(_this, This[0]->CallFunction, pFunction, (void**)pArgs);
         }
 
         [Obsolete("Use ICorDebugEval2::NewParameterizedObject instead.")]
         public int NewObject(CorDebugFunction constructor, ReadOnlySpan<CorDebugValue> args)
         {
             using var pArgs = NativeArray.AllocCom(args);
-            return Calli(_this, This[0]->NewObject, constructor, (void**)pArgs);
+            using var pConstructor = constructor?.AcquirePointer();
+            return Calli(_this, This[0]->NewObject, pConstructor, (void**)pArgs);
         }
 
         [Obsolete("Use ICorDebugEval2::NewParameterizedObjectNoConstructor instead.")]

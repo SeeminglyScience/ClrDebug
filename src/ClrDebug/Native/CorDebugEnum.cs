@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 using static ClrDebug.CalliInstructions;
-using static ClrDebug.UnsafeOps;
 
 namespace ClrDebug.Native
 {
@@ -13,8 +12,12 @@ namespace ClrDebug.Native
     /// Serves as the abstract base interface for the enumerators that are used by a
     /// debugging application.
     /// </summary>
-    public unsafe class CorDebugEnum : Unknown
+    public abstract unsafe class CorDebugEnum<TItem> : Unknown
     {
+        private protected CorDebugEnum()
+        {
+        }
+
         private protected ICorDebugEnumVtable** This => (ICorDebugEnumVtable**)DangerousGetPointer();
 
         /// <summary>
@@ -28,12 +31,6 @@ namespace ClrDebug.Native
         public int Reset() => Calli(_this, This[0]->Reset);
 
         /// <summary>
-        /// Creates a copy of this object.
-        /// </summary>
-        public int Clone(out CorDebugEnum ppEnum)
-            => InvokeGetObject(_this, This[0]->Clone, out ppEnum);
-
-        /// <summary>
         /// Gets the number of items in the enumeration.
         /// </summary>
         public int GetCount(out uint celt)
@@ -41,12 +38,51 @@ namespace ClrDebug.Native
             fixed (uint* count = &celt) return Calli(_this, This[0]->GetCount, count);
         }
 
-        public int Next(uint celt, void*** next, out uint celtFetched)
+        public int Next(uint count, void* next, uint* amountWritten)
         {
-            fixed (uint* pCeltFetched = &celtFetched)
+            return Calli(_this, This[0]->Next, count, next, amountWritten);
+        }
+
+        /// <summary>
+        /// Creates a copy of this object.
+        /// </summary>
+        public abstract int Clone(out CorDebugEnum<TItem> ppEnum);
+
+        /// <summary>
+        /// Gets the specified number of <see cref="T" /> objects from the enumeration, starting
+        /// at the current position.
+        /// </summary>
+        /// <param name="buffer">The destination buffer.</param>
+        /// <param name="amountWritten">The amount of objects written to <see paramref="next" />.</param>
+        public abstract int Next(Span<TItem> buffer, out int amountWritten);
+
+        /// <summary>
+        /// Creates a span from the COM enumerator.
+        /// </summary>
+        public ReadOnlySpan<TItem> ToSpan()
+        {
+            GetCount(out uint uCount).MaybeThrowHr();
+            int count = unchecked((int)uCount);
+            var result = new TItem[count].AsSpan();
+            Next(result, out count).MaybeThrowHr();
+            return result.Slice(0, count);
+        }
+
+        /// <summary>
+        /// Creates an array from the COM enumerator.
+        /// </summary>
+        public TItem[] ToArray()
+        {
+            GetCount(out uint uCount).MaybeThrowHr();
+            int count = unchecked((int)uCount);
+            var result = new TItem[count];
+            Next(result, out count).MaybeThrowHr();
+            if (result.Length != count)
             {
-                return Calli(_this, This[0]->Next, celt, next, pCeltFetched);
+                Array.Resize(ref result, count);
             }
+
+            return result;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -66,64 +102,121 @@ namespace ClrDebug.Native
         }
     }
 
+    public class CorDebugStructEnum<T> : CorDebugEnum<T>, IEnumerable<T>
+        where T : unmanaged
+    {
+        /// <inheritdoc />
+        public override unsafe int Clone(out CorDebugEnum<T> ppEnum)
+        {
+            void** clonedEnum = default;
+            int hResult = Calli(_this, This[0]->Clone, &clonedEnum);
+            ppEnum = ComFactory.Create<CorDebugStructEnum<T>>(clonedEnum, hResult);
+            return hResult;
+        }
+
+        /// <inheritdoc />
+        public override unsafe int Next(Span<T> buffer, out int amountWritten)
+        {
+            fixed (void* pBuffer = buffer)
+            fixed (int* pAmountWritten = &amountWritten)
+            {
+                return Next((uint)buffer.Length, pBuffer, (uint*)pAmountWritten);
+            }
+        }
+
+        public Enumerator GetEnumerator() => new Enumerator(this);
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public struct Enumerator : IEnumerator<T>
+        {
+            private readonly CorDebugEnum<T> _parent;
+
+            private readonly bool _ownsParent;
+
+            private T _obj;
+
+            internal Enumerator(CorDebugStructEnum<T> parent)
+            {
+                int hResult = parent.Clone(out _parent);
+                _ownsParent = hResult != HResult.E_NOTIMPL;
+
+                if (_ownsParent)
+                {
+                    hResult.MaybeThrowHr();
+                }
+                else
+                {
+                    _parent = parent;
+                }
+
+                _obj = default;
+            }
+
+            public unsafe T Current => _obj;
+
+            object IEnumerator.Current => Current;
+
+            public unsafe bool MoveNext()
+            {
+                fixed (T* ptr = &_obj)
+                {
+                    _obj = default;
+                    int hResult = _parent.Next(1, ptr, default);
+                    if (hResult == HResult.E_FAIL)
+                    {
+                        return false;
+                    }
+
+                    hResult.MaybeThrowHr();
+                    return true;
+                }
+            }
+
+            public void Reset() => _parent.Reset().MaybeThrowHr();
+
+            public void Dispose()
+            {
+                if (_ownsParent)
+                {
+                    _parent.Dispose();
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Represents any non-abstract interface that inherits ICorDebugEnum.
     /// </summary>
-    public class CorDebugEnum<T> : CorDebugEnum, IEnumerable<T>
+    public class CorDebugComEnum<T> : CorDebugEnum<T>, IEnumerable<T>
         where T : IComReference, new()
     {
-        /// <summary>
-        /// Creates a copy of this object.
-        /// </summary>
-        public unsafe int Clone(out CorDebugEnum<T> ppEnum) => InvokeGetObject(_this, This[0]->Clone, out ppEnum);
-
-        /// <summary>
-        /// Creates a span from the COM enumerator.
-        /// </summary>
-        public ReadOnlySpan<T> ToSpan()
+        /// <inheritdoc />
+        public override unsafe int Clone(out CorDebugEnum<T> ppEnum)
         {
-            GetCount(out uint uCount).MaybeThrowHr();
-            int count = unchecked((int)uCount);
-            var result = new T[count].AsSpan();
-            Next(result, out count).MaybeThrowHr();
-            return result.Slice(0, count);
+            void** clonedEnum = default;
+            int hResult = Calli(_this, This[0]->Clone, &clonedEnum);
+            ppEnum = ComFactory.Create<CorDebugComEnum<T>>(clonedEnum, hResult);
+            return hResult;
         }
 
-        /// <summary>
-        /// Creates an array from the COM enumerator.
-        /// </summary>
-        public T[] ToArray()
+        /// <inheritdoc />
+        public override unsafe int Next(Span<T> buffer, out int amountWritten)
         {
-            GetCount(out uint uCount).MaybeThrowHr();
-            int count = unchecked((int)uCount);
-            var result = new T[count];
-            Next(result, out count).MaybeThrowHr();
-            if (result.Length != count)
+            int count = buffer.Length;
+            Span<IntPtr> nativeBuffer = count < 60 ? stackalloc IntPtr[count] : new IntPtr[count];
+            fixed (IntPtr* pNativeBuffer = nativeBuffer)
             {
-                Array.Resize(ref result, count);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Gets the specified number of <see cref="T" /> objects from the enumeration, starting
-        /// at the current position.
-        /// </summary>
-        /// <param name="next">The destination buffer.</param>
-        /// <param name="amountWritten">The amount of objects written to <see paramref="next" />.</param>
-        public unsafe int Next(Span<T> next, out int amountWritten)
-        {
-            int count = next.Length;
-            Span<IntPtr> buffer = count < 60 ? stackalloc IntPtr[count] : new IntPtr[count];
-            fixed (IntPtr* pBuffer = buffer)
-            {
-                var b = (void***)pBuffer;
-                int result = Next(unchecked((uint)count), b, out uint celtFetched);
+                var b = (void***)pNativeBuffer;
+                uint celtFetched = default;
+                int result = Next(unchecked((uint)count), b, &celtFetched);
                 amountWritten = unchecked((int)celtFetched);
                 for (int i = 0; i < amountWritten; i++)
                 {
-                    next[i] = ComFactory.Create<T>(b[i]);
+                    buffer[i] = ComFactory.Create<T>(b[i]);
                 }
 
                 return result;
@@ -141,30 +234,27 @@ namespace ClrDebug.Native
         {
             private readonly CorDebugEnum<T> _parent;
 
+            private readonly bool _ownsParent;
+
             private unsafe void** _ptr;
 
-            private T _obj;
-
-            internal unsafe Enumerator(CorDebugEnum<T> parent)
+            internal unsafe Enumerator(CorDebugComEnum<T> parent)
             {
-                parent.Clone(out _parent).MaybeThrowHr();
-                if (_parent == null)
+                int hResult = parent.Clone(out _parent);
+                _ownsParent = hResult != HResult.E_NOTIMPL;
+                if (_ownsParent)
                 {
-                    throw new ArgumentException(
-                        "Unable to clone enumerator.",
-                        nameof(parent));
+                    hResult.MaybeThrowHr();
+                }
+                else
+                {
+                    _parent = parent;
                 }
 
                 _ptr = default;
-                _obj = default;
             }
 
-            private static unsafe T CreateComObject(void** ptr)
-                => ptr == null
-                    ? default
-                    : ComFactory.Create<T>(ptr);
-
-            public unsafe T Current => _obj ??= CreateComObject(_ptr);
+            public unsafe T Current => ComFactory.Create<T>(_ptr);
 
             object IEnumerator.Current => Current;
 
@@ -172,15 +262,26 @@ namespace ClrDebug.Native
             {
                 fixed (void*** ptr = &_ptr)
                 {
-                    _obj = default;
-                    _parent.Next(1, ptr, out uint celtFetched);
-                    return celtFetched == 1;
+                    int hResult = _parent.Next(1, ptr, default);
+                    if (hResult == HResult.E_FAIL)
+                    {
+                        return false;
+                    }
+
+                    hResult.MaybeThrowHr();
+                    return true;
                 }
             }
 
             public void Reset() => _parent.Reset().MaybeThrowHr();
 
-            public void Dispose() => _parent.Dispose();
+            public void Dispose()
+            {
+                if (_ownsParent)
+                {
+                    _parent.Dispose();
+                }
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace ClrDebug.Native
         /// <summary>
         /// Gets all of the assemblies in the application domain.
         /// </summary>
-        public int EnumerateAssemblies(out CorDebugEnum<CorDebugAssembly> assemblies)
+        public int EnumerateAssemblies(out CorDebugComEnum<CorDebugAssembly> assemblies)
             => InvokeGetObject(_this, This[0]->EnumerateAssemblies, out assemblies);
 
         /// <summary>
@@ -35,10 +35,11 @@ namespace ClrDebug.Native
         /// <param name="module">
         /// The module corresponding to the given metadata interface.
         /// </param>
-        public int GetModuleFromMetaDataInterface(in Unknown metadata, out CorDebugModule module)
+        public int GetModuleFromMetaDataInterface(Unknown metadata, out CorDebugModule module)
         {
             void* pModule = default;
-            int result = Calli(_this, This[0]->GetModuleFromMetaDataInterface, metadata, &pModule);
+            using var pMetadata = metadata?.AcquirePointer();
+            int result = Calli(_this, This[0]->GetModuleFromMetaDataInterface, pMetadata, &pModule);
             module = ComFactory.Create<CorDebugModule>(pModule);
             return result;
         }
@@ -46,13 +47,13 @@ namespace ClrDebug.Native
         /// <summary>
         /// Gets all active breakpoints in the application domain.
         /// </summary>
-        public int EnumerateBreakpoints(out CorDebugEnum<CorDebugBreakpoint> breakpoints)
+        public int EnumerateBreakpoints(out CorDebugComEnum<CorDebugBreakpoint> breakpoints)
             => InvokeGetObject(_this, This[0]->EnumerateBreakpoints, out breakpoints);
 
         /// <summary>
         /// Gets all active steppers in the application domain.
         /// </summary>
-        public int EnumerateSteppers(out CorDebugEnum<CorDebugStepper> steppers)
+        public int EnumerateSteppers(out CorDebugComEnum<CorDebugStepper> steppers)
             => InvokeGetObject(_this, This[0]->EnumerateSteppers, out steppers);
 
         /// <summary>

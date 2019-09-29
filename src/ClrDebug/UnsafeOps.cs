@@ -29,12 +29,7 @@ namespace ClrDebug
         {
             void** pValue = default;
             int result = Calli(@this, slot, &pValue);
-            value = default;
-            if (result == 0 && pValue != null)
-            {
-                value = new T();
-                value.SetPointer(pValue);
-            }
+            value = ComFactory.Create<T>(pValue, result);
 
             return result;
         }
