@@ -74,7 +74,7 @@ namespace ClrDebug.Native
         ///   successfully for a third interface, then a query for the first interface
         ///   through the pointer for the third interface must succeed.
         /// </remarks>
-        unsafe int QueryInterface(Guid riid, void** ppvObject);
+        unsafe int QueryInterface(Guid* riid, void** ppvObject);
 
         /// <summary>
         /// Increments the reference count for an interface pointer to a
