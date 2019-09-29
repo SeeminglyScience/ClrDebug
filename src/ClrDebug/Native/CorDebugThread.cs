@@ -175,7 +175,7 @@ namespace ClrDebug.Native
         /// all the threads' chains by their caller/callee relationships and
         /// regrouping them.
         /// </remarks>
-        public int EnumerateChains(out CorDebugEnum<CorDebugChain> chains)
+        public int EnumerateChains(out CorDebugComEnum<CorDebugChain> chains)
             => InvokeGetObject(_this, This[0]->EnumerateChains, out chains);
 
         /// <summary>

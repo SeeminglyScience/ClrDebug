@@ -1,5 +1,5 @@
-using System.ComponentModel;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+using ClrDebug.Native;
 
 namespace ClrDebug
 {
@@ -17,6 +17,11 @@ namespace ClrDebug
             }
 
             throw new CorDebugException(hr);
+        }
+
+        public static ref Primitive128 ToCalliArg(ref this COR_TYPEID type)
+        {
+            return ref Unsafe.As<COR_TYPEID, Primitive128>(ref type);
         }
     }
 }

@@ -98,7 +98,7 @@ namespace ClrDebug.Native
         ///   then this method will return an enumerable that contains an object
         ///   representing int32.
         /// </remarks>
-        public int EnumerateTypeParameters(out CorDebugEnum<CorDebugType> tyParEnum)
+        public int EnumerateTypeParameters(out CorDebugComEnum<CorDebugType> tyParEnum)
             => InvokeGetObject(_this, This[0]->EnumerateTypeParameters, out tyParEnum);
 
         /// <summary>

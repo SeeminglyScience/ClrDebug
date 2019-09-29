@@ -108,7 +108,7 @@ namespace ClrDebug.Native
         /// frames on its stack. Threads can be enumerated even before the <c>ICorDebugManagedCallback::CreateProcess</c>
         /// callback. The enumeration will naturally be empty.
         /// </remarks>
-        public int EnumerateThreads(out CorDebugEnum<CorDebugThread> threads)
+        public int EnumerateThreads(out CorDebugComEnum<CorDebugThread> threads)
             => InvokeGetObject(_this, This[0]->EnumerateThreads, out threads);
 
         /// <summary>
@@ -147,12 +147,12 @@ namespace ClrDebug.Native
         public int CanCommitChanges(
             uint cSnapshots,
             in ReadOnlySpan<CorDebugEditAndContinueSnapshot> snapshots,
-            out CorDebugEnum<CorDebugEditAndContinueErrorInfo> error)
+            out CorDebugComEnum<CorDebugEditAndContinueErrorInfo> error)
         {
             void* pError = default;
             using var pSnapshots = NativeArray.AllocCom(snapshots);
             int result = Calli(_this, This[0]->CanCommitChanges, cSnapshots, pSnapshots, &pError);
-            error = ComFactory.Create<CorDebugEnum<CorDebugEditAndContinueErrorInfo>>((void**)pError);
+            error = ComFactory.Create<CorDebugComEnum<CorDebugEditAndContinueErrorInfo>>(pError);
             return result;
         }
 
@@ -160,12 +160,12 @@ namespace ClrDebug.Native
         public int CommitChanges(
             uint cSnapshots,
             in ReadOnlySpan<CorDebugEditAndContinueSnapshot> snapshots,
-            out CorDebugEnum<CorDebugEditAndContinueErrorInfo> error)
+            out CorDebugComEnum<CorDebugEditAndContinueErrorInfo> error)
         {
             void* pError = default;
             using var pSnapshots = NativeArray.AllocCom(snapshots);
             int result = Calli(_this, This[0]->CommitChanges, cSnapshots, pSnapshots, &pError);
-            error = ComFactory.Create<CorDebugEnum<CorDebugEditAndContinueErrorInfo>>((void**)pError);
+            error = ComFactory.Create<CorDebugComEnum<CorDebugEditAndContinueErrorInfo>>((void**)pError);
             return result;
         }
     }

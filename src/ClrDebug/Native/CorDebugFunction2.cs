@@ -35,7 +35,7 @@ namespace ClrDebug.Native
         public int GetJMCStatus(out bool isJustMyCode) => InvokeGet(_this, This[0]->GetJMCStatus, out isJustMyCode);
 
         [Obsolete("EnumerateNativeCode is not implemented in the current version of the .NET Framework.")]
-        public int EnumerateNativeCode(out CorDebugEnum<CorDebugCode> pCodeEnum)
+        public int EnumerateNativeCode(out CorDebugComEnum<CorDebugCode> pCodeEnum)
             => InvokeGetObject(_this, This[0]->EnumerateNativeCode, out pCodeEnum);
 
         /// <summary>
