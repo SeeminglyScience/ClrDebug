@@ -27,7 +27,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugFunction : Unknown
     {
-        private ICorDebugFunctionVtable** This => (ICorDebugFunctionVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the module in which this function is defined.
@@ -97,9 +97,9 @@ namespace ClrDebug.Native
             => InvokeGet(_this, This[0]->GetCurrentVersionNumber, out nCurrentVersion);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugFunctionVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetModule;
 

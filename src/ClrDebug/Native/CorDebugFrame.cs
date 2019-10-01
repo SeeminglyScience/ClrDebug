@@ -10,7 +10,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugFrame : Unknown
     {
-        private ICorDebugFrameVtable** This => (ICorDebugFrameVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the chain this frame is a part of.
@@ -90,9 +90,9 @@ namespace ClrDebug.Native
             => InvokeGetObject(_this, This[0]->CreateStepper, out stepper);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugFrameVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetChain;
 

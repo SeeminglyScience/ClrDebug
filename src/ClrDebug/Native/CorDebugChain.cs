@@ -11,7 +11,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugChain : Unknown
     {
-        private ICorDebugChainVtable** This => (ICorDebugChainVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the physical thread this call chain is part of.
@@ -136,9 +136,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugChainVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetThread;
 

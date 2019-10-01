@@ -36,7 +36,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugStepper : Unknown
     {
-        private ICorDebugStepperVtable** This => (ICorDebugStepperVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets a value that indicates whether this instance is
@@ -180,9 +180,9 @@ namespace ClrDebug.Native
         public int SetRangeIL(int bIL) => Calli(_this, This[0]->SetRangeIL, bIL);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugStepperVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* IsActive;
 

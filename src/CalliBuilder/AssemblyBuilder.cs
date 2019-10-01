@@ -32,6 +32,7 @@ namespace CalliBuilder
             new[] { typeof(void*), typeof(void*) },
             new[] { typeof(void*), typeof(void*), typeof(void*) },
             new[] { typeof(void*), typeof(int) },
+            new[] { typeof(void*), typeof(int), typeof(int), typeof(uint), typeof(uint), typeof(void*) },
             new[] { typeof(void*), typeof(uint), typeof(void*) },
             new[] { typeof(long), typeof(void*) },
             new[] { typeof(ulong) },

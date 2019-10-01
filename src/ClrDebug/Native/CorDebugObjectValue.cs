@@ -13,9 +13,9 @@ namespace ClrDebug.Native
     /// An <see cref="CorDebugObjectValue" /> remains valid until the
     /// process being debugged is continued.
     /// </remarks>
-    public unsafe class CorDebugObjectValue : Unknown
+    public unsafe class CorDebugObjectValue : CorDebugValue
     {
-        private ICorDebugObjectValueVtable** This => (ICorDebugObjectValueVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the class of this object value.
@@ -79,9 +79,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugObjectValueVtable
+        private new struct Vtable
         {
-            public ICorDebugValueVtable ICorDebugValue;
+            public CorDebugValue.Vtable ICorDebugValue;
 
             public void* GetClass;
 

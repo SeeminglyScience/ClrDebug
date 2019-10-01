@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 
 using static ClrDebug.CalliInstructions;
 using static ClrDebug.UnsafeOps;
@@ -15,9 +14,9 @@ namespace ClrDebug.Native
     /// the process. If this instance is controlling an application domain, the scope
     /// includes only the threads of that particular application domain.
     /// </remarks>
-    public unsafe class CorDebugController : Unknown
+    public unsafe partial class CorDebugController : Unknown
     {
-        private ICorDebugControllerVtable** This => (ICorDebugControllerVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Performs a cooperative stop on all threads that are running managed code in the process.
@@ -168,31 +167,5 @@ namespace ClrDebug.Native
             error = ComFactory.Create<CorDebugComEnum<CorDebugEditAndContinueErrorInfo>>((void**)pError);
             return result;
         }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct ICorDebugControllerVtable
-    {
-        public IUnknownVtable IUnknown;
-
-        public void* Stop;
-
-        public void* Continue;
-
-        public void* IsRunning;
-
-        public void* HasQueuedCallbacks;
-
-        public void* EnumerateThreads;
-
-        public void* SetAllThreadsDebugState;
-
-        public void* Detach;
-
-        public void* ExitCode;
-
-        public void* CanCommitChanges;
-
-        public void* CommitChanges;
     }
 }

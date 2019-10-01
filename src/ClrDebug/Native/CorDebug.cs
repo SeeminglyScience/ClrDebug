@@ -32,7 +32,7 @@ namespace ClrDebug.Native
         {
         }
 
-        private ICorDebugVtable** This => (ICorDebugVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// The debugger must call this method at creation time to initialize the debugging
@@ -255,9 +255,9 @@ namespace ClrDebug.Native
             => Calli(_this, This[0]->CanLaunchOrAttach, dwProcessId, win32DebuggingEnabled);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* Initialize;
 

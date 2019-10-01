@@ -11,7 +11,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugAppDomain : CorDebugController
     {
-        private ICorDebugAppDomainVtable** This => (ICorDebugAppDomainVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the process containing the application domain.
@@ -109,9 +109,9 @@ namespace ClrDebug.Native
         public int GetID(out uint id) => InvokeGet(_this, This[0]->GetID, out id);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugAppDomainVtable
+        private new struct Vtable
         {
-            public ICorDebugControllerVtable ICorDebugController;
+            public CorDebugController.Vtable ICorDebugController;
 
             public void* GetProcess;
 

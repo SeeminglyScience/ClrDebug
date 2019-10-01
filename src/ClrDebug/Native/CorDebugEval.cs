@@ -33,7 +33,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugEval : Unknown
     {
-        private ICorDebugEvalVtable** This => (ICorDebugEvalVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         [Obsolete("Use ICorDebugEval2::CallParameterizedFunction instead.")]
         public int CallFunction(CorDebugFunction function, ReadOnlySpan<CorDebugValue> args)
@@ -134,9 +134,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugEvalVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* CallFunction;
 

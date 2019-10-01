@@ -21,9 +21,9 @@ namespace ClrDebug.Native
     /// general, the value shouldn't be held across a call of the
     /// <see cref="CorDebugController.Continue(bool)" /> method.
     /// </remarks>
-    public unsafe class CorDebugValue : Unknown
+    public unsafe partial class CorDebugValue : Unknown
     {
-        private ICorDebugValueVtable** This => (ICorDebugValueVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the primitive type of this object.
@@ -77,19 +77,5 @@ namespace ClrDebug.Native
         [Obsolete("The CreateBreakpoint method is currently not implemented.")]
         public int CreateBreakpoint(out CorDebugValueBreakpoint breakpoint)
             => InvokeGetObject(_this, This[0]->CreateBreakpoint, out breakpoint);
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct ICorDebugValueVtable
-    {
-        public IUnknownVtable IUnknown;
-
-        public new void* GetType;
-
-        public void* GetSize;
-
-        public void* GetAddress;
-
-        public void* CreateBreakpoint;
     }
 }

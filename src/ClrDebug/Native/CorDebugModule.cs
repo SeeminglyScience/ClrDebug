@@ -12,7 +12,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugModule : Unknown
     {
-        private ICorDebugModuleVtable** This => (ICorDebugModuleVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the containing process of this module.
@@ -236,9 +236,9 @@ namespace ClrDebug.Native
         public int IsInMemory(out bool inMemory) => InvokeGet(_this, This[0]->IsInMemory, out inMemory);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugModuleVtable
+        private new unsafe struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetProcess;
 

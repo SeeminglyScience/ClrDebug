@@ -11,7 +11,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugThread2 : Unknown
     {
-        private ICorDebugThread2Vtable** This => (ICorDebugThread2Vtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets information about the active function in each of
@@ -83,9 +83,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugThread2Vtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetActiveFunctions;
 

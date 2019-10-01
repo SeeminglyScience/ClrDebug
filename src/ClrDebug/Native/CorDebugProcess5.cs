@@ -24,7 +24,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugProcess5 : Unknown
     {
-        private ICorDebugProcess5Vtable** This => (ICorDebugProcess5Vtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Sets a value that determines how an application loads
@@ -347,9 +347,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct ICorDebugProcess5Vtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetGCHeapInformation;
 

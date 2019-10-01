@@ -12,7 +12,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugThread : Unknown
     {
-        private ICorDebugThreadVtable** This => (ICorDebugThreadVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the process of which this thread forms a part.
@@ -221,9 +221,9 @@ namespace ClrDebug.Native
         public int GetObject(out CorDebugValue @object) => InvokeGetObject(_this, This[0]->GetObject, out @object);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugThreadVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetProcess;
 

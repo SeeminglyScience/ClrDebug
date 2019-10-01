@@ -9,7 +9,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugFunctionBreakpoint : CorDebugBreakpoint
     {
-        private ICorDebugFunctionBreakpointVtable** This => (ICorDebugFunctionBreakpointVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the function in which the breakpoint is set.
@@ -22,11 +22,9 @@ namespace ClrDebug.Native
         public int GetOffset(out uint nOffset) => InvokeGet(_this, This[0]->GetOffset, out nOffset);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugFunctionBreakpointVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
-
-            public ICorDebugBreakpointVtable ICorDebugBreakpoint;
+            public CorDebugBreakpoint.Vtable ICorDebugBreakpoint;
 
             public void* GetFunction;
 

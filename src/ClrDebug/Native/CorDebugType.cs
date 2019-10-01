@@ -23,7 +23,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugType : Unknown
     {
-        private ICorDebugTypeVtable** This => (ICorDebugTypeVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets a <see cref="CorElementType" /> value that describes the
@@ -170,9 +170,9 @@ namespace ClrDebug.Native
         public int GetRank(out uint nRank) => InvokeGet(_this, This[0]->GetRank, out nRank);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugTypeVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public new void* GetType;
 

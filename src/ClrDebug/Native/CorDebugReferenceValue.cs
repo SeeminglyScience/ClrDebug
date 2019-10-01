@@ -26,7 +26,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugReferenceValue : CorDebugValue
     {
-        private ICorDebugReferenceValueVtable** This => (ICorDebugReferenceValueVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets a value that indicates whether this instance is a <c>null</c>
@@ -58,9 +58,9 @@ namespace ClrDebug.Native
         public int DereferenceStrong(out CorDebugValue pValue) => InvokeGetObject(_this, This[0]->DereferenceStrong, out pValue);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugReferenceValueVtable
+        private new struct Vtable
         {
-            public ICorDebugValueVtable ICorDebugValue;
+            public CorDebugValue.Vtable ICorDebugValue;
 
             public void* IsNull;
 

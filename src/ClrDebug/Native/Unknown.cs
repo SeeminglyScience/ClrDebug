@@ -1,14 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 
 using static ClrDebug.CalliInstructions;
 
 namespace ClrDebug.Native
 {
-    public unsafe class Unknown : IUnknown, IComReference, IDisposable
+    public partial class Unknown : IUnknown, IComReference, IDisposable
     {
-        protected void** _this;
+        protected unsafe void** _this;
 
         private bool _isDisposed;
 
@@ -17,11 +16,11 @@ namespace ClrDebug.Native
         {
         }
 
+        private unsafe Vtable** This => (Vtable**)_this;
+
         ~Unknown() => Dispose(false);
 
-        public bool IsDefault => _this == default;
-
-        private unsafe IUnknownVtable** This => (IUnknownVtable**)_this;
+        public unsafe bool IsDefault => _this == default;
 
         public unsafe void** DangerousGetPointer()
         {
@@ -44,14 +43,14 @@ namespace ClrDebug.Native
             GC.SuppressFinalize(this);
         }
 
-        public int QueryInterface(Guid* riid, void** ppvObject)
+        public unsafe int QueryInterface(Guid* riid, void** ppvObject)
             => Calli(_this, This[0]->QueryInterface, riid, ppvObject);
 
-        public int AddRef() => Calli(_this, This[0]->AddRef);
+        public unsafe int AddRef() => Calli(_this, This[0]->AddRef);
 
-        public int Release() => Calli(_this, This[0]->Release);
+        public unsafe int Release() => Calli(_this, This[0]->Release);
 
-        public bool TryGetInterface<T>(in Guid riid, out T comObject) where T : IComReference, new()
+        public unsafe bool TryGetInterface<T>(in Guid riid, out T comObject) where T : IComReference, new()
         {
             void* ppvObject;
             fixed (Guid* pRiid = &riid)
@@ -68,7 +67,7 @@ namespace ClrDebug.Native
             return true;
         }
 
-        void IComReference.SetPointer(void** ptr)
+        unsafe void IComReference.SetPointer(void** ptr)
         {
             if (_isDisposed)
             {
@@ -89,7 +88,7 @@ namespace ClrDebug.Native
             return new ComPointer(this);
         }
 
-        protected void** AssertNotDisposed(void** ptr)
+        protected unsafe void** AssertNotDisposed(void** ptr)
         {
             if (_isDisposed)
             {
@@ -104,7 +103,7 @@ namespace ClrDebug.Native
             return _this;
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected virtual unsafe void Dispose(bool disposing)
         {
             if (_isDisposed)
             {
@@ -115,7 +114,7 @@ namespace ClrDebug.Native
             {
             }
 
-            IUnknownVtable** vtablePtr = This;
+            Vtable** vtablePtr = This;
             _this = default;
             if (vtablePtr != default)
             {
@@ -124,15 +123,5 @@ namespace ClrDebug.Native
 
             _isDisposed = true;
         }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct IUnknownVtable
-    {
-        public void* QueryInterface;
-
-        public void* AddRef;
-
-        public void* Release;
     }
 }

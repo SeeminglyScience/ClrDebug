@@ -12,7 +12,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugFunction2 : Unknown
     {
-        private ICorDebugFunction2Vtable** This => (ICorDebugFunction2Vtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets a value that indicates whether the function that is represented
@@ -69,9 +69,9 @@ namespace ClrDebug.Native
         public int GetVersionNumber(out uint nVersion) => InvokeGet(_this, This[0]->GetVersionNumber, out nVersion);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugFunction2Vtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* SetJMCStatus;
 

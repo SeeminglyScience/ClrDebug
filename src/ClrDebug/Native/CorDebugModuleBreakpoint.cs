@@ -7,9 +7,9 @@ namespace ClrDebug.Native
     /// <summary>
     /// Provides support for module breakpoints.
     /// </summary>
-    public unsafe class CorDebugModuleBreakpoint : Unknown
+    public unsafe class CorDebugModuleBreakpoint : CorDebugBreakpoint
     {
-        private ICorDebugModuleBreakpointVtable** This => (ICorDebugModuleBreakpointVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the module in which this breakpoint is set.
@@ -17,11 +17,9 @@ namespace ClrDebug.Native
         public int GetModule(out CorDebugModule module) => InvokeGetObject(_this, This[0]->GetModule, out module);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugModuleBreakpointVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
-
-            public ICorDebugBreakpointVtable ICorDebugBreakpoint;
+            public CorDebugBreakpoint.Vtable ICorDebugBreakpoint;
 
             public void* GetModule;
         }

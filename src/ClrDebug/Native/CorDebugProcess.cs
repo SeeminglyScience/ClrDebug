@@ -11,7 +11,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugProcess : CorDebugController
     {
-        private ICorDebugProcessVtable** This => (ICorDebugProcessVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the operating system (OS) ID of the process.
@@ -318,9 +318,9 @@ namespace ClrDebug.Native
             => InvokeGet(_this, This[0]->GetHelperThreadID, out threadID);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugProcessVtable
+        private new struct Vtable
         {
-            public ICorDebugControllerVtable ICorDebugController;
+            public CorDebugController.Vtable ICorDebugController;
 
             public void* GetID;
 

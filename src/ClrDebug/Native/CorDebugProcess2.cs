@@ -11,7 +11,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugProcess2 : Unknown
     {
-        private ICorDebugProcess2Vtable** This => (ICorDebugProcess2Vtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the thread on which the task with the specified identifier
@@ -168,9 +168,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugProcess2Vtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetThreadForTaskID;
 

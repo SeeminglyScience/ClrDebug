@@ -18,7 +18,7 @@ namespace ClrDebug.Native
         {
         }
 
-        private protected ICorDebugEnumVtable** This => (ICorDebugEnumVtable**)DangerousGetPointer();
+        private protected Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Moves the cursor forward in the enumeration by the specified number of items.
@@ -86,9 +86,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private protected unsafe struct ICorDebugEnumVtable
+        private protected new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* Skip;
 

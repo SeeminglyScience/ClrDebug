@@ -9,7 +9,7 @@ namespace ClrDebug.Native
     [Obsolete("This class is obsolete.", error: true)]
     public unsafe class CorDebugEditAndContinueErrorInfo : Unknown
     {
-        private ICorDebugEditAndContinueErrorInfoVtable** This => (ICorDebugEditAndContinueErrorInfoVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         [Obsolete("This method is obsolete.", error: true)]
         public int GetModule(out CorDebugModule module) => InvokeGetObject(_this, This[0]->GetModule, out module);
@@ -31,9 +31,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugEditAndContinueErrorInfoVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetModule;
 

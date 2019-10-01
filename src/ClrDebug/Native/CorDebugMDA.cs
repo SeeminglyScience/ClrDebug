@@ -11,7 +11,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugMDA : Unknown
     {
-        private ICorDebugMDAVtable** This => (ICorDebugMDAVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets a string containing the name of the managed debugging assistant (MDA).
@@ -93,9 +93,9 @@ namespace ClrDebug.Native
         public int GetOSThreadId(out uint osTid) => InvokeGet(_this, This[0]->GetOSThreadId, out osTid);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugMDAVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetName;
 

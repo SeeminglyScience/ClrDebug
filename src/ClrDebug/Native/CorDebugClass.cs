@@ -21,7 +21,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugClass : Unknown
     {
-        private ICorDebugClassVtable** This => (ICorDebugClassVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets the module that defines this class.
@@ -63,9 +63,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugClassVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetModule;
 

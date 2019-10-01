@@ -9,7 +9,7 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugProcess3 : Unknown
     {
-        private ICorDebugProcess3Vtable** This => (ICorDebugProcess3Vtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Enables and disables custom debugger notifications of
@@ -41,9 +41,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct ICorDebugProcess3Vtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* SetEnableCustomNotification;
         }

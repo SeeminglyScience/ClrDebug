@@ -9,7 +9,7 @@ namespace ClrDebug.Native
     [Obsolete("This class is obsolete.")]
     public unsafe class CorDebugEditAndContinueSnapshot : Unknown
     {
-        private ICorDebugEditAndContinueSnapshotVtable** This => (ICorDebugEditAndContinueSnapshotVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         [Obsolete("This method is obsolete.", error: true)]
         public int CopyMetaData(void* stream, out Guid mvid)
@@ -51,9 +51,9 @@ namespace ClrDebug.Native
         public int SetPESymbolBytes(void* stream) => Calli(_this, This[0]->SetPESymbolBytes, stream);
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugEditAndContinueSnapshotVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* CopyMetaData;
 

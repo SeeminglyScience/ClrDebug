@@ -17,7 +17,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugRegisterSet : Unknown
     {
-        private ICorDebugRegisterSetVtable** This => (ICorDebugRegisterSetVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets a bit mask indicating which registers in are
@@ -116,9 +116,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugRegisterSetVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* GetRegistersAvailable;
 

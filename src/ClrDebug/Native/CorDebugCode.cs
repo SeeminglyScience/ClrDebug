@@ -17,7 +17,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugCode : Unknown
     {
-        private ICorDebugCodeVtable** This => (ICorDebugCodeVtable**)DangerousGetPointer();
+        private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
         /// Gets a value that indicates whether this represents code that was compiled in
@@ -170,9 +170,9 @@ namespace ClrDebug.Native
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private unsafe struct ICorDebugCodeVtable
+        private new struct Vtable
         {
-            public IUnknownVtable IUnknown;
+            public Unknown.Vtable IUnknown;
 
             public void* IsIL;
 
