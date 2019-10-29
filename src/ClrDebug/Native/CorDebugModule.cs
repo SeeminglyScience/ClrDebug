@@ -14,6 +14,20 @@ namespace ClrDebug.Native
     {
         private Vtable** This => (Vtable**)DangerousGetPointer();
 
+        public bool TryGetMetadataImport(out MetaDataImport metadata)
+        {
+            if (GetMetaDataInterface(CorGuids.IMetadataImport, out Unknown unknown) != HResult.S_OK)
+            {
+                unknown?.Dispose();
+                metadata = null;
+                return false;
+            }
+
+            bool result = unknown.TryGetInterface(CorGuids.IMetadataImport, out metadata);
+            unknown?.Dispose();
+            return result;
+        }
+
         /// <summary>
         /// Gets the containing process of this module.
         /// </summary>

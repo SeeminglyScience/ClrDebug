@@ -5,7 +5,7 @@ namespace ClrDebug.Native
     public unsafe partial class CorDebugHeapValue
     {
         [StructLayout(LayoutKind.Sequential)]
-        internal struct Vtable
+        internal new struct Vtable
         {
             public CorDebugValue.Vtable ICorDebugValue;
 
