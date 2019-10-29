@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.IL">
+    <PropertyGroup>
+        <DebugOptimization Condition="'$(Configuration)' == 'Release'"> -DEBUG</DebugOptimization>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <MicrosoftNetCoreIlasmPackageVersion>5.0.0-alpha1.19525.1</MicrosoftNetCoreIlasmPackageVersion>
+        <IncludePath>include</IncludePath>
+        <IlasmFlags>$(IlasmFlags) -INCLUDE=$(IncludePath)$(DebugOptimization)</IlasmFlags>
+    </PropertyGroup>
+</Project>

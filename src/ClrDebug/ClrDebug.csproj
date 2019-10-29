@@ -4,15 +4,12 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>preview</LangVersion>
+    <CodeAnalysisRuleSet>ClrDebug.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
-  <Target Name="CreateCalli" BeforeTargets="BeforeBuild">
-    <Exec Command="dotnet run --project ..\CalliBuilder\CalliBuilder.csproj ClrDebug &quot;..\..\lib\ClrDebug.Calli.dll&quot;" />
-  </Target>
-
   <ItemGroup>
-    <Reference Include="..\..\lib\ClrDebug.Calli.dll" />
     <PackageReference Include="System.Memory" Version="4.5.2" />
+    <ProjectReference Include="../ClrDebug.Native.CalliInstructions/ClrDebug.Native.CalliInstructions.ilproj" />
   </ItemGroup>
 
 </Project>
