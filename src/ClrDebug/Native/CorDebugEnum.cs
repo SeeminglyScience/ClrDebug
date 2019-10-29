@@ -4,7 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-using static ClrDebug.CalliInstructions;
+using static ClrDebug.Native.CalliInstructions;
 
 namespace ClrDebug.Native
 {

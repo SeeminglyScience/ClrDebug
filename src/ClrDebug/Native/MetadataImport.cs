@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-using static ClrDebug.CalliInstructions;
+using static ClrDebug.Native.CalliInstructions;
 
 namespace ClrDebug.Native
 {
@@ -1470,9 +1470,6 @@ namespace ClrDebug.Native
         /// </param>
         /// <param name="ppvNativeType">
         /// A pointer to the metadata signature of the field's native type.
-        /// </param>
-        /// <param name="pcbNativeType">
-        /// The size in bytes of <see paramref="ppvNativeType" />.
         /// </param>
         public int GetFieldMarshal(uint tk, out ReadOnlySpan<byte> ppvNativeType)
         {
