@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-using static ClrDebug.CalliInstructions;
+using static ClrDebug.Native.CalliInstructions;
 
 namespace ClrDebug.Native
 {
