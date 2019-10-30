@@ -5,14 +5,13 @@ using static ClrDebug.Native.CalliInstructions;
 
 namespace ClrDebug.Native
 {
-    public partial class Unknown : IUnknown, IComReference, IDisposable
+    public partial class Unknown : IUnknown, IDisposable
     {
         protected unsafe void** _this;
 
         private bool _isDisposed;
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Unknown()
+        private protected Unknown()
         {
         }
 
@@ -21,21 +20,6 @@ namespace ClrDebug.Native
         ~Unknown() => Dispose(false);
 
         public unsafe bool IsDefault => _this == default;
-
-        public unsafe void** DangerousGetPointer()
-        {
-            if (_isDisposed)
-            {
-                throw new ObjectDisposedException(null);
-            }
-
-            if (_this == default)
-            {
-                throw new ArgumentNullException(nameof(_this));
-            }
-
-            return _this;
-        }
 
         public void Dispose()
         {
@@ -50,7 +34,7 @@ namespace ClrDebug.Native
 
         public unsafe int Release() => Calli(_this, This[0]->Release);
 
-        public unsafe bool TryGetInterface<T>(in Guid riid, out T comObject) where T : IComReference, new()
+        public unsafe bool TryGetInterface<T>(in Guid riid, out T comObject) where T : Unknown
         {
             void* ppvObject;
             fixed (Guid* pRiid = &riid)
@@ -67,7 +51,7 @@ namespace ClrDebug.Native
             return true;
         }
 
-        unsafe void IComReference.SetPointer(void** ptr)
+        internal unsafe void SetPointer(void** ptr)
         {
             if (_isDisposed)
             {
@@ -86,6 +70,21 @@ namespace ClrDebug.Native
         internal ComPointer AcquirePointer()
         {
             return new ComPointer(this);
+        }
+
+        internal unsafe void** DangerousGetPointer()
+        {
+            if (_isDisposed)
+            {
+                throw new ObjectDisposedException(null);
+            }
+
+            if (_this == default)
+            {
+                throw new ArgumentNullException(nameof(_this));
+            }
+
+            return _this;
         }
 
         protected unsafe void** AssertNotDisposed(void** ptr)

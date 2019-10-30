@@ -191,20 +191,20 @@ namespace ClrDebug.Native
     /// <summary>
     /// Represents any non-abstract interface that inherits ICorDebugEnum.
     /// </summary>
-    public class CorDebugComEnum<T> : CorDebugEnum<T>, IEnumerable<T>
-        where T : IComReference, new()
+    public class CorDebugComEnum<TUnknown> : CorDebugEnum<TUnknown>, IEnumerable<TUnknown>
+        where TUnknown : Unknown
     {
         /// <inheritdoc />
-        public override unsafe int Clone(out CorDebugEnum<T> ppEnum)
+        public override unsafe int Clone(out CorDebugEnum<TUnknown> ppEnum)
         {
             void** clonedEnum = default;
             int hResult = Calli(_this, This[0]->Clone, &clonedEnum);
-            ppEnum = ComFactory.Create<CorDebugComEnum<T>>(clonedEnum, hResult);
+            ppEnum = ComFactory.Create<CorDebugComEnum<TUnknown>>(clonedEnum, hResult);
             return hResult;
         }
 
         /// <inheritdoc />
-        public override unsafe int Next(Span<T> buffer, out int amountWritten)
+        public override unsafe int Next(Span<TUnknown> buffer, out int amountWritten)
         {
             int count = buffer.Length;
             Span<IntPtr> nativeBuffer = count < 60 ? stackalloc IntPtr[count] : new IntPtr[count];
@@ -216,7 +216,7 @@ namespace ClrDebug.Native
                 amountWritten = unchecked((int)celtFetched);
                 for (int i = 0; i < amountWritten; i++)
                 {
-                    buffer[i] = ComFactory.Create<T>(b[i]);
+                    buffer[i] = ComFactory.Create<TUnknown>(b[i]);
                 }
 
                 return result;
@@ -225,20 +225,20 @@ namespace ClrDebug.Native
 
         public Enumerator GetEnumerator() => new Enumerator(this);
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IEnumerator<TUnknown> IEnumerable<TUnknown>.GetEnumerator() => GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public struct Enumerator : IEnumerator<T>
+        public struct Enumerator : IEnumerator<TUnknown>
         {
-            private readonly CorDebugEnum<T> _parent;
+            private readonly CorDebugEnum<TUnknown> _parent;
 
             private readonly bool _ownsParent;
 
             private unsafe void** _ptr;
 
-            internal unsafe Enumerator(CorDebugComEnum<T> parent)
+            internal unsafe Enumerator(CorDebugComEnum<TUnknown> parent)
             {
                 int hResult = parent.Clone(out _parent);
                 _ownsParent = hResult != HResult.E_NOTIMPL;
@@ -254,7 +254,7 @@ namespace ClrDebug.Native
                 _ptr = default;
             }
 
-            public unsafe T Current => ComFactory.Create<T>(_ptr);
+            public unsafe TUnknown Current => ComFactory.Create<TUnknown>(_ptr);
 
             object IEnumerator.Current => Current;
 
