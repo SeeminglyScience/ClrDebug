@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
+using ClrDebug.Native;
 using static ClrDebug.Native.CalliInstructions;
 
 namespace ClrDebug
 {
-    public static class UnsafeOps
+    internal static class UnsafeOps
     {
-        internal static unsafe ReadOnlySpan<char> WCharToSpan(char* ptr)
+        public static unsafe ReadOnlySpan<char> WCharToSpan(char* ptr)
         {
             if (ptr == default)
             {
@@ -25,11 +26,12 @@ namespace ClrDebug
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static unsafe int InvokeGetObject<T>(void* @this, void* slot, out T value) where T : IComReference, new()
+        public static unsafe int InvokeGetObject<TUnknown>(void* @this, void* slot, out TUnknown value)
+            where TUnknown : Unknown
         {
             void** pValue = default;
             int result = Calli(@this, slot, &pValue);
-            value = ComFactory.Create<T>(pValue, result);
+            value = ComFactory.Create<TUnknown>(pValue, result);
 
             return result;
         }

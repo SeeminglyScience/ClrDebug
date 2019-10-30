@@ -5,29 +5,30 @@ namespace ClrDebug.Native
 {
     internal static class NativeArray
     {
-        public static NativeComArray<T> AllocCom<T>(ReadOnlySpan<T> managedArray) where T : IComReference, IUnknown
+        public static NativeComArray<TUnknown> AllocCom<TUnknown>(ReadOnlySpan<TUnknown> managedArray)
+            where TUnknown : Unknown
         {
-            return NativeComArray<T>.Alloc(managedArray);
+            return NativeComArray<TUnknown>.Alloc(managedArray);
         }
     }
 
-    internal readonly unsafe ref struct NativeComArray<T> where T : IComReference, IUnknown
+    internal readonly unsafe ref struct NativeComArray<TUnknown> where TUnknown : Unknown
     {
         public readonly void*** Pointer;
 
-        private readonly ReadOnlySpan<T> _managed;
+        private readonly ReadOnlySpan<TUnknown> _managed;
 
-        private NativeComArray(void*** array, ReadOnlySpan<T> managed)
+        private NativeComArray(void*** array, ReadOnlySpan<TUnknown> managed)
         {
             Pointer = array;
             _managed = managed;
         }
 
-        public static implicit operator void*(NativeComArray<T> nativeArray) => nativeArray.Pointer;
+        public static implicit operator void*(NativeComArray<TUnknown> nativeArray) => nativeArray.Pointer;
 
-        public static explicit operator void**(NativeComArray<T> nativeArray) => (void**)nativeArray.Pointer;
+        public static explicit operator void**(NativeComArray<TUnknown> nativeArray) => (void**)nativeArray.Pointer;
 
-        public static implicit operator void***(NativeComArray<T> nativeArray) => nativeArray.Pointer;
+        public static implicit operator void***(NativeComArray<TUnknown> nativeArray) => nativeArray.Pointer;
 
         public void Dispose()
         {
@@ -43,7 +44,7 @@ namespace ClrDebug.Native
             }
         }
 
-        public static NativeComArray<T> Alloc(ReadOnlySpan<T> managedArray)
+        public static NativeComArray<TUnknown> Alloc(ReadOnlySpan<TUnknown> managedArray)
         {
             if (managedArray.IsEmpty)
             {
@@ -61,7 +62,7 @@ namespace ClrDebug.Native
                     ptr[i] = managedArray[i].DangerousGetPointer();
                 }
 
-                return new NativeComArray<T>(ptr, managedArray);
+                return new NativeComArray<TUnknown>(ptr, managedArray);
             }
             catch
             {
