@@ -20,6 +20,10 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugArrayValue : CorDebugHeapValue
     {
+        internal CorDebugArrayValue()
+        {
+        }
+
         private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>

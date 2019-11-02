@@ -105,6 +105,10 @@ namespace ClrDebug.Native
     public class CorDebugStructEnum<T> : CorDebugEnum<T>, IEnumerable<T>
         where T : unmanaged
     {
+        internal CorDebugStructEnum()
+        {
+        }
+
         /// <inheritdoc />
         public override unsafe int Clone(out CorDebugEnum<T> ppEnum)
         {
@@ -194,6 +198,10 @@ namespace ClrDebug.Native
     public class CorDebugComEnum<TUnknown> : CorDebugEnum<TUnknown>, IEnumerable<TUnknown>
         where TUnknown : Unknown
     {
+        internal CorDebugComEnum()
+        {
+        }
+
         /// <inheritdoc />
         public override unsafe int Clone(out CorDebugEnum<TUnknown> ppEnum)
         {

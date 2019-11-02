@@ -11,6 +11,10 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe class CorDebugProcess2 : Unknown
     {
+        internal CorDebugProcess2()
+        {
+        }
+
         private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>

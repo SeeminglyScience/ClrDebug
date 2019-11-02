@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using ClrDebug.Native;
@@ -68,7 +69,11 @@ namespace ClrDebug
             {
                 if (typeof(TUnknown).IsAbstract)
                 {
-                    return ThrowMissingMemberException("Cannot create an abstract class.");
+                    return ThrowMissingMemberException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            @"Cannot construct an instance of the static class ""{0}"".",
+                            typeof(TUnknown).FullName));
                 }
 
                 ConstructorInfo ctor = typeof(TUnknown)
@@ -81,7 +86,10 @@ namespace ClrDebug
                 if (ctor == null)
                 {
                     return ThrowMissingMemberException(
-                        "No parameterless constructor defined for this object.");
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            @"No parameterless constructor defined for the type ""{0}"".",
+                            typeof(TUnknown).FullName));
                 }
 
                 return Expression.Lambda<Func<TUnknown>>(Expression.New(ctor)).Compile();
@@ -89,14 +97,16 @@ namespace ClrDebug
 
             private static Func<TUnknown> ThrowMissingMemberException(string message)
             {
-                    return Expression.Lambda<Func<TUnknown>>(
+                return Expression.Lambda<Func<TUnknown>>(
+                    Expression.Block(
                         Expression.Throw(
                             Expression.New(
                                 s_missingMethodExceptionCtor,
                                 Expression.Constant(
                                     message,
-                                    typeof(string)))))
-                        .Compile();
+                                    typeof(string)))),
+                        Expression.Default(typeof(TUnknown))))
+                    .Compile();
             }
         }
     }

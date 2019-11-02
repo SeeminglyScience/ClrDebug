@@ -9,6 +9,10 @@ namespace ClrDebug.Native
     [Obsolete("This class is obsolete.")]
     public unsafe class CorDebugEditAndContinueSnapshot : Unknown
     {
+        internal CorDebugEditAndContinueSnapshot()
+        {
+        }
+
         private Vtable** This => (Vtable**)DangerousGetPointer();
 
         [Obsolete("This method is obsolete.", error: true)]
