@@ -2,7 +2,7 @@
 
 namespace ClrDebug.Native
 {
-    internal class CorError
+    internal static class CorError
     {
         public const int E_NOINTERFACE = unchecked((int)0x80004002);
 

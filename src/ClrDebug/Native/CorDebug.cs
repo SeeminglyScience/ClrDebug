@@ -27,8 +27,7 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebug : Unknown
     {
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public CorDebug() : base()
+        internal CorDebug()
         {
         }
 

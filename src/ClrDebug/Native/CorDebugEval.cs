@@ -33,6 +33,10 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugEval : Unknown
     {
+        internal CorDebugEval()
+        {
+        }
+
         private Vtable** This => (Vtable**)DangerousGetPointer();
 
         [Obsolete("Use ICorDebugEval2::CallParameterizedFunction instead.")]

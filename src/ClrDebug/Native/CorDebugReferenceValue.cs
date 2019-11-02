@@ -26,6 +26,10 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugReferenceValue : CorDebugValue
     {
+        internal CorDebugReferenceValue()
+        {
+        }
+
         private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>

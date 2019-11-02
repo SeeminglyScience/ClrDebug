@@ -36,6 +36,10 @@ namespace ClrDebug.Native
     /// </remarks>
     public unsafe class CorDebugStepper : Unknown
     {
+        internal CorDebugStepper()
+        {
+        }
+
         private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>

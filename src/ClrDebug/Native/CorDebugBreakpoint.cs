@@ -9,6 +9,10 @@ namespace ClrDebug.Native
     /// </summary>
     public unsafe partial class CorDebugBreakpoint : Unknown
     {
+        internal CorDebugBreakpoint()
+        {
+        }
+
         private Vtable** This => (Vtable**)DangerousGetPointer();
 
         /// <summary>
